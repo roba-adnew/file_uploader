@@ -30,7 +30,7 @@ app.use(
 );
 
 app.get('/', (req, res, next) => {
-    res.send('<h1> here are the sessions (Sessions)</h1>')
+    res.send('<h1> here are the sessions</h1>')
 })
 
 app.listen(3000)
