@@ -9,7 +9,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.19.2"
+    "@prisma/client": "^5.17.0",
+    "@quixo3/prisma-session-store": "^3.1.13",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "passport": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.12",
