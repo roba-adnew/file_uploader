@@ -1,0 +1,23 @@
+{
+  "name": "@file_uploader/backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "devstart": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "express-async-handler": "^1.2.0",
+    "express-session": "^1.18.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "debug": "^4.3.6",
+    "dotenv": "^16.4.5"
+  }
+}
