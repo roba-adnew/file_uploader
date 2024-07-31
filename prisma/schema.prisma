@@ -16,10 +16,8 @@ datasource db {
 model Session {
   id        String   @id
   sid       String   @unique
-  userId    String
   data      String
   expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -29,7 +27,6 @@ model User {
   hashedPassword String    @unique
   Files          File[]
   memoryUsedMB   Float     @default(0)
-  Session        Session[]
 }
 
 model File {

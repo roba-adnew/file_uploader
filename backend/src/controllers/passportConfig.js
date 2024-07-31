@@ -11,11 +11,18 @@ passport.use(
     new LocalStrategy(async (username, password, done) => {
         try {
             const user = await prisma.user.findUnique({
-                where: { username: username }
+                where: { 
+                    OR: 
+                    [{ username: usernameOrEmail }, { email: usernameOrEmail }] 
+                }
             })
-            if (!user) return done(null, false, { message: "username not found" })
+            if (!user) {
+                return done(null, false, { message: "username not found" })
+            }
             const match = await bcrypt.compare(password, user.hashedPassword)
-            if (!match) return done(null, false, { message: "incorrect password" })
+            if (!match) {
+                return done(null, false, { message: "incorrect password" })
+            }
             return done(null, user)
         } catch (err) {
             console.error(err)

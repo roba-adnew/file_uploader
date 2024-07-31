@@ -1,7 +1,7 @@
 require('dotenv').config({ path: "../.env" })
 const express = require('express')
 const expressSession = require('express-session');
-const passport = require('./src/controllers/passportConfig')
+const initializePassport = require('./src/controllers/passportConfig')
 
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
