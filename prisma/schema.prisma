@@ -16,17 +16,20 @@ datasource db {
 model Session {
   id        String   @id
   sid       String   @unique
+  userId    String
   data      String
   expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model User {
-  id             String @id @default(uuid())
-  email          String @unique
-  username       String @unique
-  hashedPassword String @unique
+  id             String    @id @default(uuid())
+  email          String    @unique
+  username       String    @unique
+  hashedPassword String    @unique
   Files          File[]
-  memoryUsedMB   Float  @default(0)
+  memoryUsedMB   Float     @default(0)
+  Session        Session[]
 }
 
 model File {
