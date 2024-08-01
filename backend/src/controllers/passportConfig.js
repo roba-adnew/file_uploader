@@ -10,12 +10,14 @@ const prisma = new PrismaClient()
 passport.use(
     new LocalStrategy(async (usernameOrEmail, password, done) => {
         try {
-            const user = await prisma.user.findUnique({
+            const userResult = await prisma.user.findMany({
                 where: { 
                     OR: 
                     [{ username: usernameOrEmail }, { email: usernameOrEmail }] 
                 }
             })
+            const user = userResult[0]
+            debug('user return: %O', user)
             if (!user) {
                 return done(null, false, { message: "username not found" })
             }

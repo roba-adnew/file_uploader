@@ -1,4 +1,9 @@
+# session check
+###
+GET http://localhost:3000/
+
 # Signup
+###
 POST http://localhost:3000/user/signup
 Content-Type: application/json
 
@@ -8,8 +13,8 @@ Content-Type: application/json
     "email": "roba.adnew@gmail.com"
 }
 
+# login
 ###
-# Login
 POST http://localhost:3000/user/login
 Content-Type: application/json 
 
@@ -17,3 +22,7 @@ Content-Type: application/json
     "username": "roba",
     "password": "him"
 }
+
+# logout
+###
+POST http://localhost:3000/user/logout

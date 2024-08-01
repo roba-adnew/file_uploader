@@ -6,7 +6,9 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 const authRouter = require('./src/routes/auth')
 
-const app = express();
+const app = express()
+app.use(express.json())
+
 const prisma = new PrismaClient()
 const prismaSession = new PrismaSessionStore(
   prisma,
@@ -15,10 +17,8 @@ const prismaSession = new PrismaSessionStore(
     dbRecordIdIsSessionId: true,
     dbRecordIdFunction: undefined,
   }
-);
+)
 
-
-app.use(express.json())
 app.use(expressSession({
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week in ms

@@ -62,8 +62,15 @@ exports.signupPost = [
 ]
 
 exports.loginPost = [
-    passport.authenticate('local'), 
-    (req, res) => { 
-        res.send({ message: 'made it here' }) 
-    }    
+    passport.authenticate('local'),
+    (req, res) => {
+        res.send({ message: 'made it here' })
+    }
 ]
+
+exports.logoutPost = (req, res, next) => {
+    req.logout((err) => {
+        if (err) { return next(err) }
+        res.send({ message: "logout successful" })
+    })
+}
