@@ -1,8 +1,7 @@
 require('dotenv').config({ path: "../.env" })
 const express = require('express')
 const expressSession = require('express-session');
-const initializePassport = require('./src/controllers/passportConfig')
-
+const passport = require('./src/controllers/passportConfig')
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 const authRouter = require('./src/routes/auth')
@@ -20,17 +19,17 @@ const prismaSession = new PrismaSessionStore(
 
 
 app.use(express.json())
-app.use(passport.initialize())
 app.use(expressSession({
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week in ms
   },
   secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
+  resave: false, // only resave on change
+  saveUninitialized: false, // only save on user authentication
   store: prismaSession
-})
-);
+}))
+app.use(passport.session())
+
 
 app.use('/user', authRouter)
 
