@@ -68,7 +68,12 @@ exports.loginPost = [
     }
 ]
 
-exports.logoutPost = (req, res, next) => {
+exports.logoutGet = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        debug('User is not authenticated');
+        return res.status(400).send({ message: "No user to log out" });
+    }
+    debug('req object: %O:', req)
     req.logout((err) => {
         if (err) { return next(err) }
         res.send({ message: "logout successful" })

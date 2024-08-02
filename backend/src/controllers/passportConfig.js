@@ -17,7 +17,7 @@ passport.use(
                 }
             })
             const user = userResult[0]
-            debug('user return: %O', user)
+            debug('login user query: %O', user)
             if (!user) {
                 return done(null, false, { message: "username not found" })
             }
@@ -39,11 +39,9 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = prisma.user.findUnique({
-            where: {
-                id: id
-            }
-        })
+        const user = await prisma.user.findUnique({ where: { id: id } })
+        debug('deserialized user: %O', user)
+        done(null, user)
     } catch (err) {
         done(err)
     }
