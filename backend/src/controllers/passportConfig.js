@@ -7,8 +7,12 @@ const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
+const fields = {
+    usernameField: "usernameOrEmail"
+}
+
 passport.use(
-    new LocalStrategy(async (usernameOrEmail, password, done) => {
+    new LocalStrategy(fields, async (usernameOrEmail, password, done) => {
         try {
             const userResult = await prisma.user.findMany({
                 where: { 
@@ -34,7 +38,8 @@ passport.use(
 )
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    debug('serializing user: %O', user)
+    done(null, user.id.toString());
 });
 
 passport.deserializeUser(async (id, done) => {
