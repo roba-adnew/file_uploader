@@ -64,16 +64,16 @@ exports.signupPost = [
 exports.loginPost = [
     passport.authenticate('local'),
     (req, res) => {
+        debug('req auth is ', req.isAuthenticated())
         res.send({ message: 'made it here' })
     }
 ]
 
 exports.logoutGet = (req, res, next) => {
     if (!req.isAuthenticated()) {
-        debug('User is not authenticated');
+        debug('User is not logged in');
         return res.status(400).send({ message: "No user to log out" });
     }
-    debug('req object: %O:', req)
     req.logout((err) => {
         if (err) { return next(err) }
         res.send({ message: "logout successful" })
