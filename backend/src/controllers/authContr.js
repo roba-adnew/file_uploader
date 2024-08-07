@@ -64,8 +64,14 @@ exports.signupPost = [
 exports.loginPost = [
     passport.authenticate('local'),
     (req, res) => {
-        debug('req auth is ', req.isAuthenticated())
-        res.send({ message: 'made it here' })
+        if (req.isAuthenticated()) {
+            return res
+                .status(200)
+                .json({ user: req.session.user, message: "logged in" })
+        }
+        return res
+            .status(403)
+            .json({ message: "unauthorized" })
     }
 ]
 
@@ -78,4 +84,13 @@ exports.logoutGet = (req, res, next) => {
         if (err) { return next(err) }
         res.send({ message: "logout successful" })
     })
+}
+
+exports.checkAuth = (req, res, next) => {
+    debug('current session state: %O', req.session)
+    debug('current req user state: %O', req.user)
+    const user = req.user;
+    if (!user) return res.status(401).json({ message: "unauthorized" });
+    res.status(200);
+    next()
 }

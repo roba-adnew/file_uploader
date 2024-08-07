@@ -7,6 +7,7 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 
 const authRouter = require('./src/routes/auth')
+const { checkAuth } = require('./src/controllers/authContr')
 
 const prisma = new PrismaClient()
 const prismaSession = new PrismaSessionStore(
@@ -34,7 +35,7 @@ app.use(passport.session())
 
 app.use('/user', authRouter)
 
-app.get('/',
+app.get('/', checkAuth,
   (req, res, next) => {
     res.send('<h1>we made it</h1>')
   }
