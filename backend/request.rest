@@ -24,6 +24,7 @@ Content-Type: application/json
 
 {
     "usernameOrEmail": "roba",
+    "usernameOrEmail": "roba",
     "password": "him"
 }
 

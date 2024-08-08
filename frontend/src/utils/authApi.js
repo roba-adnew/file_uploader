@@ -22,8 +22,12 @@ async function login(loginDetails) {
     const options = {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
+<<<<<<< HEAD
         body: JSON.stringify(loginDetails),
         credentials: 'include'
+=======
+        body: JSON.stringify(loginDetails)
+>>>>>>> 9e009b80201b5ffcc263e1f6ad0b88ff06052d5e
     }
     try {
         console.log('logging in for', loginDetails)
@@ -42,6 +46,11 @@ async function logout() {
     const options = { credentials: 'include' }
     try {
         const response = await fetch(url, options)
+<<<<<<< HEAD
+=======
+        const data = await response.json()
+        console.log(data)
+>>>>>>> 9e009b80201b5ffcc263e1f6ad0b88ff06052d5e
         return response.ok
     } catch (err) {
         console.error(err)
@@ -51,9 +60,14 @@ async function logout() {
 
 async function checkAuth() {
     const url = `${base_url}/check-auth`
+<<<<<<< HEAD
     const options = { credentials: 'include' }
     try {
         const response = await fetch(url, options)
+=======
+    try {
+        const response = await fetch(url)
+>>>>>>> 9e009b80201b5ffcc263e1f6ad0b88ff06052d5e
         console.log(response)
         return response.status
     } catch (err) {

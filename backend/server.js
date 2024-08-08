@@ -2,7 +2,10 @@ require('dotenv').config()
 const express = require('express')
 const session = require('express-session');
 const cors = require('cors')
+<<<<<<< HEAD
 const cookieParser = require('cookie-parser')
+=======
+>>>>>>> 9e009b80201b5ffcc263e1f6ad0b88ff06052d5e
 const passport = require('./src/controllers/passportConfig')
 const debug = require('debug')('backend:server')
 
