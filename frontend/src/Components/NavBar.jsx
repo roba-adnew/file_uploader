@@ -1,10 +1,13 @@
 import { useLocation, Link } from 'react-router-dom'
+import { useAuth } from '../Contexts/AuthContext'
 
 function NavBar() {
+    const { isAuthenticated, updateLogout } = useAuth()
     const location = useLocation()
-    const loggedIn = true // figure out how to check for a user with sessions
 
-    if (loggedIn) {return <Link to="/" >logout</Link>}
+    if (isAuthenticated) {
+        return <Link to="/" onClick={updateLogout}>logout</Link>
+    }
 
     switch (location.pathname) {
         case '/':

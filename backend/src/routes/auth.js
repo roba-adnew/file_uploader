@@ -8,6 +8,10 @@ router.post('/login', authController.loginPost)
 
 router.get('/logout', authController.logoutGet)
 
-router.get('/check-auth', authController.checkAuth)
+router.get('/check-auth', authController.checkAuthGet)
+
+router.get('/protected', authController.checkAuthGet, 
+    (req, res) => res.json({ message: "protected" })
+)
 
 module.exports = router

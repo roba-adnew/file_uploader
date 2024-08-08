@@ -2,6 +2,10 @@
 ###
 GET http://localhost:3000/
 
+# check auth
+###
+GET http://localhost:3000/user/protected
+
 # Signup
 ###
 POST http://localhost:3000/user/signup
@@ -19,7 +23,7 @@ POST http://localhost:3000/user/login
 Content-Type: application/json 
 
 {
-    "username": "roba",
+    "usernameOrEmail": "roba",
     "password": "him"
 }
 
