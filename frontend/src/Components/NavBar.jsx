@@ -2,10 +2,10 @@ import { useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../Contexts/AuthContext'
 
 function NavBar() {
-    const { isAuthenticated, updateLogout } = useAuth()
+    const { isAuthorized, updateLogout } = useAuth()
     const location = useLocation()
 
-    if (isAuthenticated) {
+    if (isAuthorized) {
         return <Link to="/" onClick={updateLogout}>logout</Link>
     }
 

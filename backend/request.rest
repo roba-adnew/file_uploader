@@ -2,9 +2,13 @@
 ###
 GET http://localhost:3000/
 
-# check auth
+# protected route
 ###
 GET http://localhost:3000/user/protected
+
+# check auth
+###
+GET http://localhost:3000/user/check-auth
 
 # Signup
 ###

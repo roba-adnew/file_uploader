@@ -2,10 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const session = require('express-session');
 const cors = require('cors')
-<<<<<<< HEAD
 const cookieParser = require('cookie-parser')
-=======
->>>>>>> 9e009b80201b5ffcc263e1f6ad0b88ff06052d5e
 const passport = require('./src/controllers/passportConfig')
 const debug = require('debug')('backend:server')
 
@@ -32,7 +29,7 @@ app.use(cors({
 }))
 app.use(session({
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week in ms
+    maxAge: 10*1000, //7 * 24 * 60 * 60 * 1000, // 1 week in ms
     sameSite: "lax",
     secure: false
   },

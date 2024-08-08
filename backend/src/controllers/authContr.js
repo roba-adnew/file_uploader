@@ -84,11 +84,7 @@ exports.logoutGet = (req, res, next) => {
         return res.status(400).json({ message: "No user to log out" });
     }
     req.logout((err) => {
-<<<<<<< HEAD
         if (err) return next(err)
-=======
-        if (err) { return next(err) }
->>>>>>> 9e009b80201b5ffcc263e1f6ad0b88ff06052d5e
         res.status(204).json({ message: "logout successful" })
     })
 }
@@ -96,8 +92,8 @@ exports.logoutGet = (req, res, next) => {
 exports.checkAuthGet = (req, res, next) => {
     debug('current session state: %O', req.session)
     debug('current req user state: %O', req.user)
+    debug('auth is...', req.isAuthenticated())
     const user = req.user;
     if (!user) return res.status(401).json({ message: "unauthorized" });
-    res.status(200);
-    next()
+    return res.status(200);
 }
