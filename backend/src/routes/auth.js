@@ -10,9 +10,4 @@ router.get('/logout', authController.logoutGet)
 
 router.get('/check-auth', authController.checkAuthGet)
 
-router.get('/protected', (req, res) => {
-    if (req.isAuthenticated()) { res.json({ message: "protected" }) }
-    else { res.status(401).json({ message: "currently unauthorized" }) }
-})
-
 module.exports = router

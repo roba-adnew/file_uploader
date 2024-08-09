@@ -92,7 +92,7 @@ exports.logoutGet = (req, res, next) => {
 exports.checkAuthGet = (req, res, next) => {
     debug('current session state: %O', req.session)
     debug('current req user state: %O', req.user)
-    debug('auth is...', req.isAuthenticated())
+    debug('auth state is', req.isAuthenticated())
     const user = req.user;
     if (!user) return res.status(401).json({ message: "unauthorized" });
     return res.status(200);

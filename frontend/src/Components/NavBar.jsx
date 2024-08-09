@@ -1,8 +1,9 @@
+import { useContext } from 'react'
 import { useLocation, Link } from 'react-router-dom'
-import { useAuth } from '../Contexts/AuthContext'
+import { AuthContext } from '../Contexts/AuthContext'
 
 function NavBar() {
-    const { isAuthorized, updateLogout } = useAuth()
+    const { isAuthorized, updateLogout } = useContext(AuthContext)
     const location = useLocation()
 
     if (isAuthorized) {

@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { login as apiLogin } from '../utils/authApi'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../Contexts/AuthContext'
+import { AuthContext } from '../Contexts/AuthContext'
 
 function Login() {
-    const { authorize, isAuthorized } = useAuth()
+    const { authorize, isAuthorized } = useContext(AuthContext)
     const [credentials, setCredentials] = useState({
         usernameOrEmail: '',
         password: ''

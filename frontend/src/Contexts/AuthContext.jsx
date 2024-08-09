@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types'
 import { 
@@ -54,10 +54,8 @@ function AuthProvider({ children }) {
     )
 }
 
-function useAuth() { return useContext(AuthContext) }
-
 AuthProvider.propTypes = {
     children: PropTypes.arrayOf(PropTypes.element)
 }
 
-export { AuthProvider, useAuth }
+export { AuthProvider, AuthContext }
