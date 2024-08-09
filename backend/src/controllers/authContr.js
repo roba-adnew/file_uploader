@@ -95,5 +95,5 @@ exports.checkAuthGet = (req, res, next) => {
     debug('auth state is', req.isAuthenticated())
     const user = req.user;
     if (!user) return res.status(401).json({ message: "unauthorized" });
-    return res.status(200);
+    return res.status(200).json({ message: "authorized"});
 }

@@ -10,6 +10,7 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 
 const authRouter = require('./src/routes/auth')
+const managerRouter = require('./src/routes/manage')
 
 const prisma = new PrismaClient()
 const prismaSession = new PrismaSessionStore(
@@ -29,7 +30,7 @@ app.use(cors({
 }))
 app.use(session({
   cookie: {
-    maxAge: 10*1000, //7 * 24 * 60 * 60 * 1000, // 1 week in ms
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week in ms
     sameSite: "lax",
     secure: false
   },
@@ -41,13 +42,9 @@ app.use(session({
 app.use(passport.session())
 app.use(cookieParser())
 
-app.use((req, res, next) => {
-  debug('unsigned: ', req.cookies)
-  debug('signed: ', req.signedCookies)
-  next()
-})
 
 app.use('/user', authRouter)
+app.use('/manage', managerRouter)
 
 app.get('/',
   (req, res, next) => {
