@@ -2,8 +2,13 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-    const users = await prisma.user.findMany()
-    console.log(users)
+    try {
+        const users = await prisma.folder.findMany()
+        console.log(users)
+    }
+    catch (error) {
+        console.error('Error deleting users:', error)
+    }
 }
 
 main()

@@ -48,7 +48,19 @@ exports.signupPost = [
                             hashedPassword: hashedPassword
                         }
                     })
-                    console.log("successful account creation", user)
+                    const root = await prisma.folder.create({
+                        data: {
+                            name: "root",
+                            path: "/",
+                            owner: {
+                                connect: {
+                                    id: user.id
+                                }
+                            }
+                        }
+                    })
+                    debug("successful account creation", user)
+                    debug("root folder created", root)
                     res.redirect("/")
                 } catch (err2) {
                     return next(err2)

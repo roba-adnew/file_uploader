@@ -18,6 +18,6 @@ exports.formUploadPost = [
     (req, res, next) => {
         debug('file details', req.file)
         if (!req.isAuthenticated()) return res.status(401)
-        next()
+        return res.status(201).json({ message: "file uploaded" })
     }
 ]

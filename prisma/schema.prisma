@@ -21,12 +21,13 @@ model Session {
 }
 
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique
-  username       String    @unique
-  hashedPassword String    @unique
+  id             String   @id @default(uuid())
+  email          String   @unique
+  username       String   @unique
+  hashedPassword String   @unique
   Files          File[]
-  memoryUsedMB   Float     @default(0)
+  Folders        Folder[]
+  memoryUsedMB   Float    @default(0)
 }
 
 model File {
@@ -59,12 +60,15 @@ model Folder {
   fileCount   Int @default(0)
   folderCount Int @default(0)
 
-  deleted   Boolean  @default(false)
-  deletedAt DateTime
+  deleted   Boolean   @default(false)
+  deletedAt DateTime?
 
   parent   Folder?  @relation("ParentChild", fields: [parentId], references: [id])
   parentId String?
   children Folder[] @relation("ParentChild")
+
+  owner  User   @relation(fields: [userId], references: [id])
+  userId String
 
   @@unique([name, path])
 }
