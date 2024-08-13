@@ -24,7 +24,9 @@ exports.signupPost = [
             }
 
             if (usernameExists) {
-                return res.status(409).send({ message: "username already exists" })
+                return res
+                    .status(409)
+                    .send({ message: "username already exists" })
             }
 
             next();
@@ -51,6 +53,18 @@ exports.signupPost = [
                     const root = await prisma.folder.create({
                         data: {
                             name: "root",
+                            isRoot: true,
+                            owner: {
+                                connect: {
+                                    id: user.id
+                                }
+                            }
+                        }
+                    })
+                    const trash = await prisma.folder.create({
+                        data: {
+                            name: "trash",
+                            isTrash: true,
                             owner: {
                                 connect: {
                                     id: user.id
@@ -59,7 +73,7 @@ exports.signupPost = [
                         }
                     })
                     debug("successful account creation", user)
-                    debug("root folder created", root)
+                    debug("root and trash folders created", root, trash)
                     res.redirect("/")
                 } catch (err2) {
                     return next(err2)
@@ -103,8 +117,10 @@ exports.logoutGet = (req, res, next) => {
 exports.checkAuthGet = (req, res, next) => {
     debug('current session state: %O', req.session)
     debug('current req user state: %O', req.user)
-    debug('auth state is', req.isAuthenticated())
+    debug('auth stands at:', req.isAuthenticated())
+    debug('body %O', req.body)
     const user = req.user;
-    if (!user) return res.status(401).json({ message: "unauthorized" });
-    return res.status(200).json({ message: "authorized"});
+    const authenticated = !!user && req.isAuthenticated();
+    if (!authenticated) return res.status(401).json({ message: "unauthorized" });
+    next();
 }
