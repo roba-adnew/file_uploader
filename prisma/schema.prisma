@@ -53,7 +53,6 @@ enum Type {
 model Folder {
   id        String   @id @default(uuid())
   name      String
-  path      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -69,6 +68,4 @@ model Folder {
 
   owner  User   @relation(fields: [userId], references: [id])
   userId String
-
-  @@unique([name, path])
 }

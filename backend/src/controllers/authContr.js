@@ -51,7 +51,6 @@ exports.signupPost = [
                     const root = await prisma.folder.create({
                         data: {
                             name: "root",
-                            path: "/",
                             owner: {
                                 connect: {
                                     id: user.id
