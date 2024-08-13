@@ -22,6 +22,7 @@ const upload = multer({ storage })
 exports.fileUploadPost = [
     upload.single('uploaded_file'),
     checkAuth,
+    checkAuth,
     async (req, res, next) => {
         debug('file details: %O', req.file)
         try {
@@ -51,6 +52,7 @@ exports.fileUploadPost = [
 ]
 
 exports.createFolderPost = async (req, res, next) => {
+    checkAuth();
     checkAuth();
     debug('commencing new folder creation: %O', req.body);
     const { parentId, name } = req.body
