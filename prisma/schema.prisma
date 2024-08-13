@@ -25,29 +25,25 @@ model User {
   email          String   @unique
   username       String   @unique
   hashedPassword String   @unique
-  Files          File[]
-  Folders        Folder[]
+  files          File[]
+  folders        Folder[]
   memoryUsedMB   Float    @default(0)
 }
 
 model File {
-  id         String   @id @default(uuid())
-  name       String
-  folderPath String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  type       Type
-  owner      User     @relation(fields: [userId], references: [id])
-  userId     String
-  downloads  Int
-  deleted    Boolean  @default(false)
-  deletedAt  DateTime
-}
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type      String
+  owner     User     @relation(fields: [userId], references: [id])
+  userId    String
+  downloads Int      @default(0)
+  deleted   Boolean  @default(false)
+  deletedAt DateTime?
 
-enum Type {
-  DOC
-  XLS
-  PNG
+  folder   Folder @relation(fields: [folderId], references: [id])
+  folderId String
 }
 
 model Folder {
@@ -61,6 +57,8 @@ model Folder {
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?
+
+  files File[]
 
   parent   Folder?  @relation("ParentChild", fields: [parentId], references: [id])
   parentId String?

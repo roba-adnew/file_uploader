@@ -3,7 +3,7 @@ const prisma = new PrismaClient()
 
 async function main() {
     try {
-        const users = await prisma.folder.findMany()
+        const users = await prisma.file.findMany()
         console.log(users)
     }
     catch (error) {
