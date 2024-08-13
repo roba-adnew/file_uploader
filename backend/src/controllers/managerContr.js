@@ -128,7 +128,7 @@ exports.updateFileNamePut = [
             const newPath = path
                 .join(__dirname, '../../public', `${newName}${ext}`)
             debug('filePath:', filePath, 'newPath', newPath)
-            const rename = await fs.rename(filePath, newPath)
+            await fs.rename(filePath, newPath)
             debug('file name changes to ', updatedFile.name)
             res.status(200).json({ message: "file name changed" })
         } catch (err) {
