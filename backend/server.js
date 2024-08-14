@@ -9,8 +9,9 @@ const debug = require('debug')('backend:server')
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 
-const authRouter = require('./src/routes/auth')
-const managerRouter = require('./src/routes/manage')
+const authRouter = require('./src/routes/authRouter')
+const fileRouter = require('./src/routes/fileRouter')
+const folderRouter = require('./src/routes/folderRouter')
 
 const prisma = new PrismaClient()
 const prismaSession = new PrismaSessionStore(
@@ -44,7 +45,8 @@ app.use(cookieParser())
 
 
 app.use('/user', authRouter)
-app.use('/manage', managerRouter)
+app.use('/file', fileRouter)
+app.use('/folder', folderRouter)
 
 app.get('/',
   (req, res, next) => {

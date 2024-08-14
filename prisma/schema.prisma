@@ -58,9 +58,6 @@ model Folder {
   isRoot  Boolean @default(false)
   isTrash Boolean @default(false)
 
-  fileCount   Int @default(0)
-  folderCount Int @default(0)
-
   deleted   Boolean   @default(false)
   deletedAt DateTime?
 
