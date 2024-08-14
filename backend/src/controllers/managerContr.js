@@ -5,7 +5,6 @@ const path = require('path')
 const fs = require('fs/promises')
 const checkAuth = require('./authContr').checkAuthGet
 const { PrismaClient } = require('@prisma/client')
-const { type } = require('os')
 
 const prisma = new PrismaClient()
 const storage = multer.diskStorage({
@@ -138,7 +137,7 @@ exports.updateFileLocationPut = [
         const { fileId, oldFolderId, newFolderId } = req.body
         const file = await prisma.file.findFirst({ where: { id: fileId }})
         const oldLineage = await getFolderIdLineage(file)
-        const newLineage = await getFolderIdLineage(oldFolderId)
+        const newLineage = await getFolderIdLineage(newFolderId)
 
         const readOldLineagePromises = oldLineage.map(
             async (folderId) => {
@@ -314,24 +313,25 @@ async function getFolderIdLineage(fileOrId) {
     debug('lineage input: %O', fileOrId)
     const fileId = typeof fileOrId === 'string' ? fileOrId : fileOrId.folderId;
     debug('lineage input update: %O', fileId)
-    const folderChain = [fileId]
+    const folderLineage = [fileId]
+    let parentExists= true;
     let i = 0;
     try {
         do {
             const folder = await prisma.folder.findFirst({
-                where: { id: folderChain[i] },
+                where: { id: folderLineage[i] },
                 include: { parent: true }
             })
             debug(`#${i} folder lookup`, folder)
             debug(`parent exists`, !!folder.parent)
-            let parentExists = !!folder.parent;
+            parentExists = !!folder.parent;
             if (parentExists) {
-                i = folderChain.push(folder.parentId) - 1;
+                i = folderLineage.push(folder.parentId) - 1;
             }
         }
         while (parentExists)
     } catch (err) {
         debug('error retrieving folder lineage', err)
     }
-    return folderChain
+    return folderLineage
 }

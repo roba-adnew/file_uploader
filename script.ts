@@ -16,6 +16,30 @@ async function findChildren() {
     }
 }
 
+async function clearFilesAndFolders() {
+    try {
+        const fileDeletion = await prisma.file.deleteMany()
+        const folderDeletion = await prisma.folder.deleteMany({
+            where: {
+                AND: {
+                    isRoot: false,
+                    isTrash: false
+                }
+            }
+        })
+        const rootTrashReset = await prisma.folder.updateMany({
+            data: { sizeKB: 0 }
+        })
+        const userReset = await prisma.user.updateMany({
+            data: { memoryUsedKB: 0 }
+        })
+        console.log('files deleted', fileDeletion, 'folders deleted', folderDeletion, 'root and trash reset', rootTrashReset)
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+
 async function updates() {
     try {
         const user = await prisma.user.updateMany({
@@ -38,7 +62,7 @@ async function main() {
                 parent: {
                     select: { name: true }
                 },
-                files : {
+                files: {
                     select: { name: true }
                 },
                 childFolders: {
@@ -71,4 +95,3 @@ main()
         await prisma.$disconnect()
         process.exit(1)
     })
-
