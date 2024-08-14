@@ -9,6 +9,8 @@ router.post('/file', managerContr.fileUploadPost)
 
 router.put('/file', managerContr.updateFileNamePut)
 
+router.delete('/file', managerContr.deleteFileDelete)
+
 router.post('/folder', managerContr.createFolderPost)
 
 module.exports = router

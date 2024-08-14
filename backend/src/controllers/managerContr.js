@@ -22,7 +22,6 @@ const upload = multer({ storage })
 exports.fileUploadPost = [
     upload.single('uploaded_file'),
     checkAuth,
-    checkAuth,
     async (req, res, next) => {
         debug('file details: %O', req.file)
         try {
@@ -37,7 +36,7 @@ exports.fileUploadPost = [
                     },
                     folder: {
                         connect: {
-                            id: req.body.folder,
+                            id: req.body.folderId,
                         }
                     }
                 }
@@ -111,7 +110,6 @@ exports.updateFileNamePut = [
         const { fileId, newName } = req.body;
         try {
             debug('commencing file name change')
-
             const fileDetails = await prisma.file.findFirst({
                 where: { id: fileId }
             })
@@ -120,21 +118,63 @@ exports.updateFileNamePut = [
                     .status(404)
                     .json({ message: "file has been deleted" })
             }
+            const filePath =
+                path.join(__dirname, '../../public', fileDetails.name)
+            const ext = path.extname(filePath)
+
+
             const updatedFile = await prisma.file.update({
                 where: { id: fileId },
-                data: { name: newName }
+                data: { name: `${newName}${ext}` }
             })
-            const filePath = path
-                .join(__dirname, '../../public', fileDetails.name)
-            const ext = path.extname(filePath)
-            const newPath = path
-                .join(__dirname, '../../public', `${newName}${ext}`)
-            debug('filePath:', filePath, 'newPath', newPath)
+            const newPath =
+                path.join(__dirname, '../../public', `${newName}${ext}`)
+
             await fs.rename(filePath, newPath)
             debug('file name changes to ', updatedFile.name)
             res.status(200).json({ message: "file name changed" })
         } catch (err) {
             debug('error in updating file name', err)
+            throw err
+        }
+    }
+]
+
+exports.deleteFileDelete = [
+    checkAuth,
+    async (req, res, next) => {
+        const { fileId } = req.body;
+        debug('commencing file name change')
+
+        try {
+            const trashFolder = await prisma.folder.findFirst({
+                where: { userId: req.user.id, isTrash: true }
+            })
+
+            const deleted = await prisma.file.update({
+                where: { id: fileId },
+                data: { 
+                    deleted: true, 
+                    deletedAt: new Date(Date.now()),
+                    folder: {
+                        connect: {
+                            id: trashFolder.id,
+                        }
+                    }
+                 }
+            })
+
+            debug('DB deleted folder', deleted)
+
+            const partialPath =
+                path.join(__dirname, '../../public', deleted.name)
+            // const ext = path.extname(partialPath)
+            // const deletedPath = path.join(partialPath, ext)
+            debug('path', partialPath)
+            await fs.rm(partialPath)
+            return res.status(201).json({ message: "file has been deleted" })
+        } catch (err) {
+            debug('error deleting file: %O', err)
             throw err
         }
     }
