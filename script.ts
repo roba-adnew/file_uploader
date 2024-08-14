@@ -1,10 +1,23 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
+async function updates() {
+    try {
+        const results = await prisma.user.update({
+            where: { id: '111' },
+            data: { id: 'value' }
+        })
+        console.log('results', results)
+    }
+    catch (error) {
+        console.error('Error deleting users:', error)
+    }
+}
+
 async function main() {
     try {
-        const users = await prisma.file.findMany()
-        console.log(users)
+        const results = await prisma.user.findMany()
+        console.log('results', results)
     }
     catch (error) {
         console.error('Error deleting users:', error)
