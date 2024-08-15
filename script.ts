@@ -4,9 +4,10 @@ const prisma = new PrismaClient()
 async function findChildren() {
     try {
         const results = await prisma.folder.findUnique({
-            where: { id: "f8853f36-e155-424a-9ac8-0bfaeea9efb8" },
+            where: { id: "c4fc6e90-4aa1-4fb6-b8a1-53a6255260f1" },
             include: {
-                parent: true
+                childFolders: true,
+                files: true
             }
         })
         console.log('child results', results)
@@ -86,7 +87,7 @@ async function main() {
     }
 }
 
-main()
+findChildren()
     .then(async () => {
         await prisma.$disconnect()
     })

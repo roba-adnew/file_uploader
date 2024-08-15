@@ -63,10 +63,33 @@ exports.createFolderPost = [
     }
 ]
 
-// exports.readFolderContentsGet = [
-//     checkAuth,
-//     async (req, res, next) => {
+exports.readFolderContentsGet = [
+    checkAuth,
+    async (req, res, next) => {
+        const { folderId } = req.body;
+        try {
+            const results = await prisma.folder.findUnique({
+                where: { id: folderId },
+                include: {
+                    childFolders: true,
+                    files: true
+                }
+            })
+            const allChildren = toJSONObject(results)
+            debug(
+                'folder children raw', results, 
+                'folder children transformed', allChildren
+            )
+            return res.status(200).json({ results: allChildren })
+        } catch (err) {
+            debug('error getting folder contents: %O', err)
+            throw err
+        }
+    }
+]
 
-//     }
-// ]
-
+function toJSONObject(object) {
+    return JSON.parse(JSON.stringify(object, (key, value) => {
+        return typeof value === 'bigint' ? value.toString() : value
+    }))
+}
