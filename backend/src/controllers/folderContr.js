@@ -10,7 +10,7 @@ exports.getFolderIdLineage = async (fileOrId) => {
     const fileId = typeof fileOrId === 'string' ? fileOrId : fileOrId.folderId;
     debug('lineage input update: %O', fileId)
     const folderLineage = [fileId]
-    let parentExists= true;
+    let parentExists = true;
     let i = 0;
     try {
         do {
@@ -77,12 +77,30 @@ exports.readFolderContentsGet = [
             })
             const allChildren = toJSONObject(results)
             debug(
-                'folder children raw', results, 
+                'folder children raw', results,
                 'folder children transformed', allChildren
             )
             return res.status(200).json({ results: allChildren })
         } catch (err) {
             debug('error getting folder contents: %O', err)
+            throw err
+        }
+    }
+]
+
+exports.updateFolderNamePut = [
+    checkAuth,
+    async (req, res, next) => {
+        const { folderId, newName } = req.body;
+        try {
+            const updatedFolder = await prisma.folder.update({
+                where: { id: folderId },
+                data: { name: newName }
+            })
+            debug('update results', updatedFolder)
+            return res.status(200).json({ message: "folder name updated" })
+        } catch (err) {
+            debug('error updating file name: %O', err)
             throw err
         }
     }

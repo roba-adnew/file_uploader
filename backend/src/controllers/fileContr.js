@@ -99,6 +99,7 @@ exports.viewFileGet = [
 exports.updateFileNamePut = [
     checkAuth,
     async (req, res, next) => {
+        // keep the file deletion check, make sure ext is handled when moving to supabase
         const { fileId, newName } = req.body;
         try {
             debug('commencing file name change')

@@ -87,7 +87,7 @@ async function main() {
     }
 }
 
-findChildren()
+main()
     .then(async () => {
         await prisma.$disconnect()
     })
