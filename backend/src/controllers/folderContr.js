@@ -5,6 +5,12 @@ const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
+exports.toJSONObject = (object) => {
+    return JSON.parse(JSON.stringify(object, (key, value) => {
+        return typeof value === 'bigint' ? value.toString() : value
+    }))
+}
+
 exports.getFolderIdLineage = async (fileOrId) => {
     debug('lineage input: %O', fileOrId)
     const fileId = typeof fileOrId === 'string' ? fileOrId : fileOrId.parentFolderId;
@@ -241,8 +247,3 @@ exports.deleteFolderDelete = [
     }
 ]
 
-function toJSONObject(object) {
-    return JSON.parse(JSON.stringify(object, (key, value) => {
-        return typeof value === 'bigint' ? value.toString() : value
-    }))
-}

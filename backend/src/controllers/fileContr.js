@@ -5,6 +5,7 @@ const path = require('path')
 const fs = require('fs/promises')
 const checkAuth = require('./authContr').checkAuthGet
 const getFolderIdLineage = require('./folderContr').getFolderIdLineage;
+const toJSONObject = require('./folderContr').toJSONObject;
 const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
@@ -74,7 +75,7 @@ exports.fileUploadPost = [
     }
 ]
 
-exports.viewFileGet = [
+exports.readFileGet = [
     checkAuth,
     async (req, res, next) => {
         const { fileId } = req.body;
@@ -90,6 +91,8 @@ exports.viewFileGet = [
             }
             const filePath = path
                 .join(__dirname, '../../public', fileDetails.name)
+
+            const fileObject = toJSONObject(fileDetails)
             return res.status(200).sendFile(filePath)
         } catch (err) {
             debug('error retrieving file', err)

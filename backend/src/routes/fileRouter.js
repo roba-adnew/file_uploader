@@ -3,7 +3,7 @@ const fileContr = require('../controllers/fileContr')
 
 const router = express.Router();
 
-router.get('/', fileContr.viewFileGet)
+router.get('/', fileContr.readFileGet)
 
 router.post('/', fileContr.fileUploadPost)
 
