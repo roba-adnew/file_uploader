@@ -7,8 +7,11 @@ const checkAuth = require('./authContr').checkAuthGet
 const getFolderIdLineage = require('./folderContr').getFolderIdLineage;
 const toJSONObject = require('./folderContr').toJSONObject;
 const { PrismaClient } = require('@prisma/client')
+const { createClient } = require('@supabase/supabase-js')
 
 const prisma = new PrismaClient()
+const supabase = createClient(process.env.SP_API_URL, process.env.SB_API_KEY)
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         return cb(null, 'public')
@@ -26,6 +29,7 @@ exports.fileUploadPost = [
         debug('file details: %O', req.file)
         const { filename, mimetype, size } = req.file;
         const { parentFolderId } = req.body;
+
         try {
             const newFile = await prisma.file.create({
                 data: {
@@ -101,6 +105,39 @@ exports.readFileGet = [
     }
 ]
 
+exports.sbDownloadGet = [
+    checkAuth,
+    async (req, res, next) => {
+        try {
+            const fileName = 'sb_pic.png';
+            const { data, error } = await supabase
+                .storage
+                .from('files')
+                .download(fileName)
+            const fileObject = new File([data], fileName)
+            const file = Buffer.from(await fileObject.arrayBuffer())
+
+            debug('sb data raw:%O', data)
+            debug('sb download file object:%O', fileObject)
+            debug('sb download buffered file:%O', file)
+
+            res.setHeader('Content-Type', data.type)
+            res.setHeader(
+                'Content-Disposition', 
+                `attachment; filename="${fileObject.name}"`
+            )
+
+            if (error) {
+                debug('Error downloading from Supabase:', error)
+                return res.status(500).json({ error: 'Failed to download file' })
+                }
+            return res.status(200).send(file)
+        } catch (error) {
+            debug('unexpected error downloading from supabase', error)
+        }
+    }
+]
+
 exports.updateFileNamePut = [
     checkAuth,
     async (req, res, next) => {
@@ -155,7 +192,8 @@ exports.updateFileLocationPut = [
                     return result;
                 }
             )
-            const readOldLineageResults = await Promise.all(readOldLineagePromises)
+            const readOldLineageResults =
+                await Promise.all(readOldLineagePromises)
 
             const readNewLineagePromises = newLineage.map(
                 async (folderId) => {
@@ -165,7 +203,8 @@ exports.updateFileLocationPut = [
                     return result
                 }
             )
-            const readNewLineageResults = await Promise.all(readNewLineagePromises);
+            const readNewLineageResults =
+                await Promise.all(readNewLineagePromises);
 
             const updatedFile = await prisma.file.update({
                 where: { id: file.id },

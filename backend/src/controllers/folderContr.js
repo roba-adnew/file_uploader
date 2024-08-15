@@ -116,9 +116,13 @@ exports.updateFolderLocationPut = [
     async (req, res, next) => {
         try {
             const { folderId, newParentFolderId } = req.body
-            const folder = await prisma.folder.findFirst({ where: { id: folderId } })
-            const oldLineage = await exports.getFolderIdLineage(folder)
-            const newLineage = await exports.getFolderIdLineage(newParentFolderId)
+            const folder = await prisma.folder.findFirst(
+                { where: { id: folderId } }
+            )
+            const oldLineage = 
+                await exports.getFolderIdLineage(folder)
+            const newLineage = 
+                await exports.getFolderIdLineage(newParentFolderId)
 
             const readOldLineagePromises = oldLineage.map(
                 async (folderId) => {
@@ -128,7 +132,8 @@ exports.updateFolderLocationPut = [
                     return result;
                 }
             )
-            const readOldLineageResults = await Promise.all(readOldLineagePromises)
+            const readOldLineageResults = 
+                await Promise.all(readOldLineagePromises)
 
             const readNewLineagePromises = newLineage.map(
                 async (folderId) => {
@@ -138,7 +143,8 @@ exports.updateFolderLocationPut = [
                     return result
                 }
             )
-            const readNewLineageResults = await Promise.all(readNewLineagePromises);
+            const readNewLineageResults = await 
+                Promise.all(readNewLineagePromises);
 
             const updatedFolder = await prisma.folder.update({
                 where: { id: folder.id },
@@ -200,7 +206,8 @@ exports.deleteFolderDelete = [
             const trashFolder = await prisma.folder.findFirst({
                 where: { userId: req.user.id, isTrash: true }
             })
-            const folderLineage = await exports.getFolderIdLineage(folderToDelete)
+            const folderLineage = 
+                await exports.getFolderIdLineage(folderToDelete)
 
             const deleted = await prisma.folder.update({
                 where: { id: folderToDelete.id },

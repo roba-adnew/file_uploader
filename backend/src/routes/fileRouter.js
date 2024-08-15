@@ -3,6 +3,8 @@ const fileContr = require('../controllers/fileContr')
 
 const router = express.Router();
 
+router.get('/sb', fileContr.sbDownloadGet)
+
 router.get('/', fileContr.readFileGet)
 
 router.post('/', fileContr.fileUploadPost)
