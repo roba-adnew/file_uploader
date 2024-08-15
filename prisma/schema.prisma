@@ -36,7 +36,7 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   type      String
-  owner     User     @relation(fields: [userId], references: [id])
+  owner     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    String
   downloads Int      @default(0)
   sizeKB    BigInt   @default(0)
@@ -44,7 +44,7 @@ model File {
   deleted   Boolean   @default(false)
   deletedAt DateTime?
 
-  parentFolder   Folder @relation(fields: [parentFolderId], references: [id])
+  parentFolder   Folder @relation(fields: [parentFolderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   parentFolderId String
 }
 
@@ -63,7 +63,7 @@ model Folder {
 
   files File[]
 
-  parentFolder   Folder?  @relation("ParentChild", fields: [parentFolderId], references: [id])
+  parentFolder   Folder?  @relation("ParentChild", fields: [parentFolderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   parentFolderId String?
   childFolders   Folder[] @relation("ParentChild")
 

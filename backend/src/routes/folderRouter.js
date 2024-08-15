@@ -11,4 +11,6 @@ router.put('/name', folderContr.updateFolderNamePut)
 
 router.put('/location', folderContr.updateFolderLocationPut)
 
+router.delete('/', folderContr.deleteFolderDelete)
+
 module.exports = router
