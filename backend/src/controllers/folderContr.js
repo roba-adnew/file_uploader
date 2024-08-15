@@ -7,25 +7,24 @@ const prisma = new PrismaClient()
 
 exports.getFolderIdLineage = async (fileOrId) => {
     debug('lineage input: %O', fileOrId)
-    const fileId = typeof fileOrId === 'string' ? fileOrId : fileOrId.folderId;
+    const fileId = typeof fileOrId === 'string' ? fileOrId : fileOrId.parentFolderId;
     debug('lineage input update: %O', fileId)
     const folderLineage = [fileId]
-    let parentExists = true;
+    let parentFolderExists = true;
     let i = 0;
     try {
         do {
             const folder = await prisma.folder.findFirst({
                 where: { id: folderLineage[i] },
-                include: { parent: true }
+                include: { parentFolder: true }
             })
             debug(`#${i} folder lookup`, folder)
-            debug(`parent exists`, !!folder.parent)
-            parentExists = !!folder.parent;
-            if (parentExists) {
-                i = folderLineage.push(folder.parentId) - 1;
+            parentFolderExists = !!folder.parentFolder;
+            if (parentFolderExists) {
+                i = folderLineage.push(folder.parentFolderId) - 1;
             }
         }
-        while (parentExists)
+        while (parentFolderExists)
     } catch (err) {
         debug('error retrieving folder lineage', err)
     }
@@ -36,7 +35,7 @@ exports.createFolderPost = [
     checkAuth,
     async (req, res, next) => {
         debug('commencing new folder creation: %O', req.body);
-        const { parentId, name } = req.body
+        const { parentFolderId, name } = req.body
         try {
             const newFolder = await prisma.folder.create({
                 data: {
@@ -46,9 +45,9 @@ exports.createFolderPost = [
                             id: req.user.id,
                         }
                     },
-                    parent: {
+                    parentFolder: {
                         connect: {
-                            id: parentId,
+                            id: parentFolderId,
                         }
                     }
                 }
@@ -103,6 +102,78 @@ exports.updateFolderNamePut = [
             debug('error updating file name: %O', err)
             throw err
         }
+    }
+]
+
+exports.updateFolderLocationPut = [
+    checkAuth,
+    async (req, res, next) => {
+        const { folderId, newParentFolderId } = req.body
+        const folder = await prisma.folder.findFirst({ where: { id: folderId }})
+        const oldLineage = await exports.getFolderIdLineage(folder)
+        const newLineage = await exports.getFolderIdLineage(newParentFolderId)
+
+        const readOldLineagePromises = oldLineage.map(
+            async (folderId) => {
+                const result = await prisma.folder.findFirst({
+                    where: { id: folderId },
+                })
+                return result;
+            }
+        )
+        const readOldLineageResults = await Promise.all(readOldLineagePromises)
+
+        const readNewLineagePromises = newLineage.map(
+            async (folderId) => {
+                const result = await prisma.folder.findFirst({
+                    where: { id: folderId }
+                })
+                return result
+            }
+        )
+        const readNewLineageResults = await Promise.all(readNewLineagePromises);
+
+        const updatedFolder = await prisma.folder.update({
+            where: { id: folder.id },
+            data: {
+                parentFolder: { connect: { id: newParentFolderId } }
+            }
+        })
+
+        debug('folder', folder)
+        debug('old Lineage', oldLineage)
+        const updateOldLineagePromises = oldLineage.map(
+            async (folderId) => {
+                const result = await prisma.folder.update({
+                    where: { id: folderId },
+                    data: { sizeKB: { decrement: folder.sizeKB } }
+                })
+                return result;
+            }
+        )
+        const updateOldLineageResults = 
+            await Promise.all(updateOldLineagePromises);
+
+        const updateNewLineagePromises = newLineage.map(
+            async (folderId) => {
+                const result = await prisma.folder.updateMany({
+                    where: { id: folderId },
+                    data: { sizeKB: { increment: folder.sizeKB } }
+                })
+                return result;
+            }
+        )
+        const updateNewLineageResults = 
+            await Promise.all(updateNewLineagePromises);
+
+        debug('old folder details', folder)
+        debug('new folder details', updatedFolder)
+        debug('old lineage pre-move results', readOldLineageResults)
+        debug('old lineage update results', updateOldLineageResults)
+        debug('new lineage pre-move results', readNewLineageResults)
+        debug('new lineage update results', updateNewLineageResults)
+
+        return res.status(200).json({ message: "folder move successful"})
     }
 ]
 

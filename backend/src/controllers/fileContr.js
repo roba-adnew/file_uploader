@@ -23,20 +23,22 @@ exports.fileUploadPost = [
     checkAuth,
     async (req, res, next) => {
         debug('file details: %O', req.file)
+        const { filename, mimetype, size } = req.file;
+        const { parentFolderId } = req.body;
         try {
             const newFile = await prisma.file.create({
                 data: {
-                    name: req.file.filename,
-                    type: req.file.mimetype,
-                    sizeKB: req.file.size,
+                    name: filename,
+                    type: mimetype,
+                    sizeKB: size,
                     owner: {
                         connect: {
                             id: req.user.id,
                         }
                     },
-                    folder: {
+                    parentFolder: {
                         connect: {
-                            id: req.body.folderId,
+                            id: parentFolderId
                         }
                     }
                 }
@@ -136,14 +138,14 @@ exports.updateFileNamePut = [
 exports.updateFileLocationPut = [
     checkAuth,
     async (req, res, next) => {
-        const { fileId, oldFolderId, newFolderId } = req.body
-        const file = await prisma.file.findFirst({ where: { id: fileId }})
+        const { fileId, newParentFolderId } = req.body
+        const file = await prisma.file.findFirst({ where: { id: fileId } })
         const oldLineage = await getFolderIdLineage(file)
-        const newLineage = await getFolderIdLineage(newFolderId)
+        const newLineage = await getFolderIdLineage(newParentFolderId)
 
         const readOldLineagePromises = oldLineage.map(
             async (folderId) => {
-                const result = await prisma.folder.findUnique({
+                const result = await prisma.folder.findFirst({
                     where: { id: folderId },
                 })
                 return result;
@@ -153,7 +155,7 @@ exports.updateFileLocationPut = [
 
         const readNewLineagePromises = newLineage.map(
             async (folderId) => {
-                const result = await prisma.folder.findUnique({
+                const result = await prisma.folder.findFirst({
                     where: { id: folderId }
                 })
                 return result
@@ -161,13 +163,10 @@ exports.updateFileLocationPut = [
         )
         const readNewLineageResults = await Promise.all(readNewLineagePromises);
 
-        const oldFolder = prisma.folder.findFirst({ where: { id: oldFolderId }})
-        const newFolder = prisma.folder.findFirst({ where: { id: newFolderId }})
-
         const updatedFile = await prisma.file.update({
             where: { id: file.id },
             data: {
-                folder: { connect: { id: newFolderId } }
+                parentFolder: { connect: { id: newParentFolderId } }
             }
         })
 
@@ -180,7 +179,7 @@ exports.updateFileLocationPut = [
                 return result;
             }
         )
-        const updateOldLineageResults = 
+        const updateOldLineageResults =
             await Promise.all(updateOldLineagePromises);
 
         const updateNewLineagePromises = newLineage.map(
@@ -192,7 +191,7 @@ exports.updateFileLocationPut = [
                 return result;
             }
         )
-        const updateNewLineageResults = 
+        const updateNewLineageResults =
             await Promise.all(updateNewLineagePromises);
 
         debug('old file details', file)
@@ -202,7 +201,7 @@ exports.updateFileLocationPut = [
         debug('new lineage pre-move results', readNewLineageResults)
         debug('new lineage update results', updateNewLineageResults)
 
-        return res.status(200).json({ message: "file move successful"})
+        return res.status(200).json({ message: "file move successful" })
     }
 ]
 
@@ -272,10 +271,3 @@ exports.deleteFileDelete = [
         }
     }
 ]
-
-// exports.readFolderContentsGet = [
-//     checkAuth,
-//     async (req, res, next) => {
-
-//     }
-// ]

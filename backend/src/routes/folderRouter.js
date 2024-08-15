@@ -9,4 +9,6 @@ router.post('/', folderContr.createFolderPost)
 
 router.put('/name', folderContr.updateFolderNamePut)
 
+router.put('/location', folderContr.updateFolderLocationPut)
+
 module.exports = router

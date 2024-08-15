@@ -60,7 +60,7 @@ async function main() {
     try {
         const folders = await prisma.folder.findMany({
             include: {
-                parent: {
+                parentFolder: {
                     select: { name: true }
                 },
                 files: {
@@ -73,7 +73,7 @@ async function main() {
         })
         const files = await prisma.file.findMany({
             include: {
-                folder: {
+                parentFolder: {
                     select: { name: true }
                 }
             }
@@ -87,7 +87,7 @@ async function main() {
     }
 }
 
-main()
+clearFilesAndFolders()
     .then(async () => {
         await prisma.$disconnect()
     })
