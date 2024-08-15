@@ -20,32 +20,36 @@ const storage = multer.diskStorage({
         return cb(null, file.originalname)
     }
 })
-const upload = multer({ storage })
+const upload = multer({ storage: multer.memoryStorage() })
 
 exports.fileUploadPost = [
     upload.single('uploaded_file'),
     checkAuth,
     async (req, res, next) => {
         debug('file details: %O', req.file)
-        const { filename, mimetype, size } = req.file;
+        const { originalname, buffer, mimetype, size } = req.file;
         const { parentFolderId } = req.body;
 
+        debug('name', originalname)
         try {
+            const { data, error } = await supabase
+                .storage
+                .from('files')
+                .upload(originalname, buffer, {
+                    contentType: mimetype,
+                    upset: false
+                })
+
+            debug('sb upload returns', data)
+            debug('sb error upload: %O', error)
+
             const newFile = await prisma.file.create({
                 data: {
-                    name: filename,
+                    name: originalname,
                     type: mimetype,
                     sizeKB: size,
-                    owner: {
-                        connect: {
-                            id: req.user.id,
-                        }
-                    },
-                    parentFolder: {
-                        connect: {
-                            id: parentFolderId
-                        }
-                    }
+                    owner: { connect: { id: req.user.id } },
+                    parentFolder: { connect: { id: parentFolderId } }
                 }
             })
 
@@ -109,7 +113,7 @@ exports.sbDownloadGet = [
     checkAuth,
     async (req, res, next) => {
         try {
-            const fileName = 'sb_pic.png';
+            const fileName = 'sb_pic_orig.png';
             const { data, error } = await supabase
                 .storage
                 .from('files')
