@@ -10,7 +10,7 @@ const { PrismaClient } = require('@prisma/client')
 const { createClient } = require('@supabase/supabase-js')
 
 const prisma = new PrismaClient()
-const supabase = createClient(process.env.SP_API_URL, process.env.SB_API_KEY)
+const supabase = createClient(process.env.SB_API_URL, process.env.SB_API_KEY)
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -30,7 +30,6 @@ exports.fileUploadPost = [
         const { originalname, buffer, mimetype, size } = req.file;
         const { parentFolderId } = req.body;
 
-        debug('name', originalname)
         try {
             const { data, error } = await supabase
                 .storage
@@ -117,7 +116,11 @@ exports.sbDownloadGet = [
             const { data, error } = await supabase
                 .storage
                 .from('files')
-                .download(fileName)
+                .getPublicUrl(fileName)
+
+                // .createSignedUrl(fileName, 600)
+                // .download(fileName)
+                
             const fileObject = new File([data], fileName)
             const file = Buffer.from(await fileObject.arrayBuffer())
 
@@ -133,7 +136,9 @@ exports.sbDownloadGet = [
 
             if (error) {
                 debug('Error downloading from Supabase:', error)
-                return res.status(500).json({ error: 'Failed to download file' })
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to download file' })
                 }
             return res.status(200).send(file)
         } catch (error) {

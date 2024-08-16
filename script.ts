@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client'
+const { createClient } = require('@supabase/supabase-js')
+
 const prisma = new PrismaClient()
+const supabase = createClient(process.env.SB_API_URL, process.env.SB_API_KEY)
 
 async function findChildren() {
     try {
@@ -34,12 +37,39 @@ async function clearFilesAndFolders() {
         const userReset = await prisma.user.updateMany({
             data: { memoryUsedKB: 0 }
         })
-        console.log('files deleted', fileDeletion, 'folders deleted', folderDeletion, 'root and trash reset', rootTrashReset)
+
+        const { data: listData, error: listError } = await supabase
+            .storage
+            .from('files')
+            .list();
+
+        if (listError) console.error('supabase listing error', listError);
+        const fileList: string[] = listData.map(
+            (file: { name: string }) => {
+                if (file.name !== '.emptyFolderPlaceholder') return file.name
+            }
+        );
+
+        const finalFileList: string[] = fileList
+            .filter(file => file !== undefined)
+
+        const { data: deleteData, error: deleteError } = await supabase
+            .storage
+            .from('files')
+            .remove(finalFileList);
+        if (deleteError) console.error('supabase deleting error', deleteError);
+
+        console.log(
+            'files deleted', fileDeletion,
+            'folders deleted', folderDeletion,
+            'root and trash reset', rootTrashReset,
+            'user reset', userReset,
+            'supabase deletion', deleteData
+        )
     } catch (err) {
         console.error(err)
     }
 }
-
 
 async function updates() {
     try {
@@ -56,7 +86,7 @@ async function updates() {
     }
 }
 
-async function main() {
+async function findEverything() {
     try {
         const folders = await prisma.folder.findMany({
             include: {
@@ -79,8 +109,22 @@ async function main() {
             }
         })
         const users = await prisma.user.findMany()
+        const { data: listData, error: listError } = await supabase
+            .storage
+            .from('files')
+            .list()
+         const fileList: string[] = listData.map(
+            (file: { name: string }) => file.name
+        );
 
-        console.log('files', files, 'folders', folders, 'users', users)
+        if (listError) console.error('supabase listing error', listError)
+
+        console.log(
+            'files', files,
+            'folders', folders,
+            'users', users,
+            'supabase files', fileList
+        )
     }
     catch (error) {
         console.error('Error deleting users:', error)
