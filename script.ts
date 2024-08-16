@@ -44,19 +44,18 @@ async function clearFilesAndFolders() {
             .list();
 
         if (listError) console.error('supabase listing error', listError);
-        const fileList: string[] = listData.map(
-            (file: { name: string }) => {
+        const fileList: string[] = listData
+            .map((file: { name: string }) => {
                 if (file.name !== '.emptyFolderPlaceholder') return file.name
-            }
-        );
-
-        const finalFileList: string[] = fileList
-            .filter(file => file !== undefined)
+            })
+            .filter((name: string) => {
+                if (name !== '.emptyFolderPlaceholder') return name
+            })
 
         const { data: deleteData, error: deleteError } = await supabase
             .storage
             .from('files')
-            .remove(finalFileList);
+            .remove(fileList);
         if (deleteError) console.error('supabase deleting error', deleteError);
 
         console.log(
@@ -113,11 +112,14 @@ async function findEverything() {
             .storage
             .from('files')
             .list()
-         const fileList: string[] = listData.map(
-            (file: { name: string }) => file.name
-        );
-
+        
         if (listError) console.error('supabase listing error', listError)
+
+        const fileList: string[] = listData
+            .map((file: { name: string }) => file.name)
+            .filter((name: string) => {
+                if (name !== '.emptyFolderPlaceholder') return name
+            })
 
         console.log(
             'files', files,
@@ -131,7 +133,41 @@ async function findEverything() {
     }
 }
 
-clearFilesAndFolders()
+async function testing() {
+    try {
+        const diff = 1000;
+        let trashFiles = await prisma.file.findMany({
+            where: { 
+                parentFolderId: "60e5d65c-7c67-4a85-87a4-5d568c9975ce", // replace with trashFolder.id
+                deleted: true 
+            },
+            orderBy: { deletedAt: 'asc' }
+        })
+        const trashFileIds = trashFiles.map(file => file.id)
+
+        let deletedKB = 0;
+        let deletedFiles = [];
+
+        if (true) {
+            for (let file of trashFiles) {
+                deletedKB =+ file.sizeKB
+                deletedFiles.push(trashFiles.shift())
+                if (deletedKB >= diff) break
+            }
+        }
+
+        console.log(
+            'trash files', trashFiles,
+            'deleted files', deletedFiles,
+            'deleted amount', deletedKB
+        )
+
+    } catch (err) {
+        console.error('error testing queries', err)
+    }
+}
+
+findEverything()
     .then(async () => {
         await prisma.$disconnect()
     })

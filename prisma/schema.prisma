@@ -27,7 +27,7 @@ model User {
   hashedPassword String   @unique
   files          File[]
   folders        Folder[]
-  memoryUsedKB   BigInt   @default(0)
+  memoryUsedKB   Float    @default(0)
 }
 
 model File {
@@ -39,7 +39,7 @@ model File {
   owner     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    String
   downloads Int      @default(0)
-  sizeKB    BigInt   @default(0)
+  sizeKB    Float    @default(0)
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?
@@ -53,7 +53,7 @@ model Folder {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  sizeKB    BigInt   @default(0)
+  sizeKB    Float    @default(0)
 
   isRoot  Boolean @default(false)
   isTrash Boolean @default(false)

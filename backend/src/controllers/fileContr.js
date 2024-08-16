@@ -12,14 +12,6 @@ const { createClient } = require('@supabase/supabase-js')
 const prisma = new PrismaClient()
 const supabase = createClient(process.env.SB_API_URL, process.env.SB_API_KEY)
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        return cb(null, 'public')
-    },
-    filename: (req, file, cb) => {
-        return cb(null, file.originalname)
-    }
-})
 const upload = multer({ storage: multer.memoryStorage() })
 
 exports.fileUploadPost = [
@@ -36,17 +28,17 @@ exports.fileUploadPost = [
                 .from('files')
                 .upload(originalname, buffer, {
                     contentType: mimetype,
-                    upset: false
+                    upsert: false
                 })
 
-            debug('sb upload returns', data)
+            debug('sb upload (expect null): %O', data)
             debug('sb error upload: %O', error)
 
             const newFile = await prisma.file.create({
                 data: {
                     name: originalname,
                     type: mimetype,
-                    sizeKB: size,
+                    sizeKB: size / 1000,
                     owner: { connect: { id: req.user.id } },
                     parentFolder: { connect: { id: parentFolderId } }
                 }
@@ -165,16 +157,18 @@ exports.updateFileNamePut = [
             const filePath =
                 path.join(__dirname, '../../public', fileDetails.name)
             const ext = path.extname(filePath)
+            const newPath =
+                path.join(__dirname, '../../public', `${newName}${ext}`)
+            await fs.rename(filePath, newPath)
+            
 
 
             const updatedFile = await prisma.file.update({
                 where: { id: fileId },
                 data: { name: `${newName}${ext}` }
             })
-            const newPath =
-                path.join(__dirname, '../../public', `${newName}${ext}`)
+            
 
-            await fs.rename(filePath, newPath)
             debug('file name changes to ', updatedFile.name)
             res.status(200).json({ message: "file name changed" })
         } catch (err) {
@@ -281,7 +275,7 @@ exports.deleteFileDelete = [
                 data: {
                     deleted: true,
                     deletedAt: new Date(Date.now()),
-                    folder: {
+                    parentFolder: {
                         connect: {
                             id: trashFolder.id,
                         }
@@ -293,6 +287,7 @@ exports.deleteFileDelete = [
                 data: { sizeKB: { increment: fileToDelete.sizeKB } }
             })
 
+            debug('trash folder post update: %O', addTrashMemory)
             const reduceMemoryFolderPromises = folderLineage.map(
                 async (folderId) => {
                     const result = await prisma.folder.update({
@@ -303,22 +298,57 @@ exports.deleteFileDelete = [
                 }
             )
             const folderUpdates = await Promise.all(reduceMemoryFolderPromises)
+
             const userUpdate = await prisma.user.update({
                 where: { id: fileToDelete.userId },
                 data: { memoryUsedKB: { decrement: fileToDelete.sizeKB } }
             })
 
+            // const fiveMBinKB = 5 * 1000 * 1000 / 1000 
+            const fiveMBinKB = 1400;
+
+            let trashFiles;
+            if (addTrashMemory.sizeKB > fiveMBinKB) {
+                const memoryToDelete = addTrashMemory.sizeKB - fiveMBinKB;
+                trashFiles = await prisma.file.findMany({
+                    where: { 
+                        parentFolderId: trashFolder.id,
+                        deleted: true 
+                    },
+                    orderBy: { deletedAt: 'asc' }
+                })
+                // trashFiles.forEach(file => file.name)
+
+                let deletedKB = 0;
+                let deletedFiles = [];
+
+                for (let file of trashFiles) {
+                    deletedKB += file.sizeKB;
+                    deletedFiles.push(file)
+
+                    const dbDeletion = await prisma.file.delete({
+                        where: { id: file.id }
+                    })
+                    const updateTrashFolder = await prisma.folder.update({
+                        where: { id: trashFolder.id },
+                        data: { sizeKB: { decrement: file.sizeKB } }
+                    })
+
+                    const { data, error } = await supabase
+                        .storage
+                        .from('files')
+                        .remove([file.name])
+                    
+                    if (deletedKB >= memoryToDelete) break
+                }
+            }
+
             debug('DB deleted file', deleted)
             debug('trash folder memory increase', addTrashMemory)
             debug('folder memory reduction results', folderUpdates)
             debug('user memory update', userUpdate)
+            debug('trash files', trashFiles)
 
-            const partialPath =
-                path.join(__dirname, '../../public', deleted.name)
-            // const ext = path.extname(partialPath)
-            // const deletedPath = path.join(partialPath, ext)
-            debug('path', partialPath)
-            await fs.rm(partialPath)
             return res.status(201).json({ message: "file has been deleted" })
         } catch (err) {
             debug('error deleting file: %O', err)
