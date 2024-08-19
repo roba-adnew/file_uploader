@@ -46,6 +46,13 @@ exports.postFileUpload = [
                     upsert: false
                 })
 
+            if (error) {
+                debug('Error uploading to Supabase:', error)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to upload file' })
+            }
+
             debug('sb upload (expect null): %O', data)
             debug('sb error upload: %O', error)
 
@@ -81,7 +88,7 @@ exports.postFileUpload = [
             debug('folder memory update results', folderUpdates)
             debug('user memory update', userUpdate)
 
-            return res.status(201).json({ message: "file uploaded" })
+            return res.status(201).json({ message: "file uploaded", newFile })
         } catch (err) {
             debug('error uploading file: %O', err)
             throw err
@@ -124,7 +131,7 @@ exports.getFile = [
                     .json({ error: 'Failed to download file' })
             }
             return res.status(200).send(file)
-              
+
         } catch (error) {
             debug('unexpected error downloading from supabase', error)
         }
@@ -145,11 +152,8 @@ exports.getFileDetails = [
                     .status(404)
                     .json({ message: "file has been deleted" })
             }
-            const filePath = path
-                .join(__dirname, '../../public', fileDetails.name)
 
-            const fileObject = toJSONObject(fileDetails)
-            return res.status(200).sendFile(filePath)
+            return res.status(200).send(fileDetails)
         } catch (err) {
             debug('error retrieving file', err)
             throw err
@@ -172,23 +176,65 @@ exports.updateFileNamePut = [
                     .status(404)
                     .json({ message: "file has been deleted" })
             }
-            const filePath =
-                path.join(__dirname, '../../public', fileDetails.name)
-            const ext = path.extname(filePath)
-            const newPath =
-                path.join(__dirname, '../../public', `${newName}${ext}`)
-            await fs.rename(filePath, newPath)
 
+            const ext = fileDetails.name
+                .slice((fileDetails.name.lastIndexOf('.') - 1 >>> 0) + 1);
+            debug('extension:', ext)
 
+            const { data: downloadData, 
+                error: downloadError } = await supabase
+                .storage
+                .from('files')
+                .download(fileDetails.name)
+
+            if (downloadError) {
+                debug('Error downloading from supabase for name change:'
+                    , downloadError)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to upload file' })
+            }
+
+            const fileObject = new File([downloadData], fileDetails.name)
+            const fileBuffer = Buffer.from(await fileObject.arrayBuffer())
+
+            const { data: nameChangeDeleteData,
+                error: nameChangeDeleteError } = await supabase
+                    .storage
+                    .from('files')
+                    .remove([fileDetails.name])
+
+            if (nameChangeDeleteError) {
+                debug('Error deleting from supabase for name change:'
+                    , nameChangeDeleteError)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to upload file' })
+            }
 
             const updatedFile = await prisma.file.update({
                 where: { id: fileId },
                 data: { name: `${newName}${ext}` }
             })
 
+            const { data: nameChangeUploadData,
+                error: nameChangeUploadError } = await supabase
+                    .storage
+                    .from('files')
+                    .upload(updatedFile.name, fileBuffer, {
+                        contentType: downloadData.type,
+                        upsert: false
+                    })
+
+            if (nameChangeUploadError) {
+                debug('Error uploading to Supabase:', nameChangeUploadError)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to upload file' })
+            }
 
             debug('file name changes to ', updatedFile.name)
-            res.status(200).json({ message: "file name changed" })
+            res.status(200).json({ message: "file name changed", updatedFile })
         } catch (err) {
             debug('error in updating file name', err)
             throw err
@@ -272,7 +318,7 @@ exports.updateFileLocationPut = [
     }
 ]
 
-exports.deleteFileD = [
+exports.deleteFile = [
     checkAuth,
     async (req, res, next) => {
         const { fileId } = req.body;
@@ -352,6 +398,11 @@ exports.deleteFileD = [
                         .storage
                         .from('files')
                         .remove([file.name])
+
+                    if (error) {
+                        debug('error deleting file', error)
+                        res.status(500).json({ message: 'error deleting file' })
+                    }
 
                     if (deletedKB >= memoryToDelete) break
                 }
