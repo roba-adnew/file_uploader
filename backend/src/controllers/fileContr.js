@@ -1,11 +1,8 @@
 require('dotenv').config()
 const debug = require('debug')('backend:manager')
 const multer = require('multer')
-const path = require('path')
-const fs = require('fs/promises')
-const checkAuth = require('./authContr').checkAuthGet
+const getAuthCheck = require('./authContr').getAuthCheck
 const getFolderIdLineage = require('./folderContr').getFolderIdLineage;
-const toJSONObject = require('./folderContr').toJSONObject;
 const { PrismaClient } = require('@prisma/client')
 const { createClient } = require('@supabase/supabase-js')
 
@@ -18,7 +15,7 @@ const fiveMBinKB = 5 * 1000 * 1000 / 1000
 
 exports.postFileUpload = [
     upload.single('uploaded_file'),
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         debug('file details: %O', req.file)
         const { originalname, buffer, mimetype, size } = req.file;
@@ -97,7 +94,7 @@ exports.postFileUpload = [
 ]
 
 exports.getFile = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         try {
             const { fileId } = req.body;
@@ -139,7 +136,7 @@ exports.getFile = [
 ]
 
 exports.getFileDetails = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         const { fileId } = req.body;
         debug(`commence file retrieval for file#${fileId}`, req.body);
@@ -162,9 +159,8 @@ exports.getFileDetails = [
 ]
 
 exports.updateFileNamePut = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
-        // keep the file deletion check, make sure ext is handled when moving to supabase
         const { fileId, newName } = req.body;
         try {
             debug('commencing file name change')
@@ -243,7 +239,7 @@ exports.updateFileNamePut = [
 ]
 
 exports.updateFileLocationPut = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         const { fileId, newParentFolderId } = req.body
         try {
@@ -319,7 +315,7 @@ exports.updateFileLocationPut = [
 ]
 
 exports.deleteFile = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         const { fileId } = req.body;
         debug('commencing file deletion')

@@ -1,11 +1,11 @@
 require('dotenv').config()
 const debug = require('debug')('backend:manager')
-const checkAuth = require('./authContr').checkAuthGet
+const getAuthCheck = require('./authContr').getAuthCheck
 const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
-exports.toJSONObject = (object) => {
+function toJSONObject(object) {
     return JSON.parse(JSON.stringify(object, (key, value) => {
         return typeof value === 'bigint' ? value.toString() : value
     }))
@@ -38,7 +38,7 @@ exports.getFolderIdLineage = async (fileOrId) => {
 }
 
 exports.createFolderPost = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         debug('commencing new folder creation: %O', req.body);
         const { parentFolderId, name } = req.body
@@ -69,7 +69,7 @@ exports.createFolderPost = [
 ]
 
 exports.readFolderContentsGet = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         const { folderId } = req.body;
         try {
@@ -94,7 +94,7 @@ exports.readFolderContentsGet = [
 ]
 
 exports.updateFolderNamePut = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         const { folderId, newName } = req.body;
         try {
@@ -112,7 +112,7 @@ exports.updateFolderNamePut = [
 ]
 
 exports.updateFolderLocationPut = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         try {
             const { folderId, newParentFolderId } = req.body
@@ -194,7 +194,7 @@ exports.updateFolderLocationPut = [
 ]
 
 exports.deleteFolderDelete = [
-    checkAuth,
+    getAuthCheck,
     async (req, res, next) => {
         const { folderId } = req.body;
         debug('commencing folder deletion')
@@ -253,4 +253,3 @@ exports.deleteFolderDelete = [
         }
     }
 ]
-

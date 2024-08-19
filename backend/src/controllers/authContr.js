@@ -6,7 +6,7 @@ const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
-exports.signupPost = [
+exports.postSignup = [
     async (req, res, next) => {
         debug('request body: %O', req.body)
         try {
@@ -86,7 +86,7 @@ exports.signupPost = [
     }
 ]
 
-exports.loginPost = [
+exports.postLogin = [
     passport.authenticate('local'),
     (req, res) => {
         if (req.isAuthenticated()) {
@@ -102,7 +102,7 @@ exports.loginPost = [
     }
 ]
 
-exports.logoutGet = (req, res, next) => {
+exports.postLogout = (req, res, next) => {
     debug('req session at logout', req.session)
     if (!req.isAuthenticated()) {
         debug('User is not logged in');
@@ -114,13 +114,14 @@ exports.logoutGet = (req, res, next) => {
     })
 }
 
-exports.checkAuthGet = (req, res, next) => {
+exports.getAuthCheck = (req, res, next) => {
     debug('current session state: %O', req.session)
     debug('current req user state: %O', req.user)
     debug('auth stands at:', req.isAuthenticated())
     debug('body %O', req.body)
     const user = req.user;
     const authenticated = !!user && req.isAuthenticated();
-    if (!authenticated) return res.status(401).json({ message: "unauthorized" });
+    if (!authenticated) return res.status(401).json({ message:"unauthorized" });
+    res.status(200).json({ message: "user is logged in", user})
     next();
 }

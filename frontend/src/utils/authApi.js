@@ -39,7 +39,7 @@ async function login(loginDetails) {
 
 async function logout() {
     const url = `${base_url}/logout`
-    const options = { credentials: 'include' }
+    const options = { method: 'POST', credentials: 'include' }
     try {
         const response = await fetch(url, options)
         return response.ok
@@ -54,7 +54,7 @@ async function checkAuth() {
     const options = { credentials: 'include' }
     try {
         const response = await fetch(url, options)
-        console.log('check auth reponse', response)
+        console.log('check auth response', response)
         return response.ok
     } catch (err) {
         console.error(err)
