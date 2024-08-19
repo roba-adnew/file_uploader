@@ -14,6 +14,8 @@ const supabase = createClient(process.env.SB_API_URL, process.env.SB_API_KEY)
 
 const upload = multer({ storage: multer.memoryStorage() })
 
+const fiveMBinKB = 5 * 1000 * 1000 / 1000 
+
 exports.fileUploadPost = [
     upload.single('uploaded_file'),
     checkAuth,
@@ -21,8 +23,20 @@ exports.fileUploadPost = [
         debug('file details: %O', req.file)
         const { originalname, buffer, mimetype, size } = req.file;
         const { parentFolderId } = req.body;
+        const fileSizeKB = size / 1000;
 
         try {
+            const user = await prisma.user.findFirst({
+                where: { id: req.user.id }
+            })
+
+
+            if (user.memoryUsedKB + fileSizeKB > fiveMBinKB) {
+                return res
+                    .status(405)
+                    .json({ message: "memory limit exceeded. \
+                        try a smaller file or deleting a current file" })
+            }
             const { data, error } = await supabase
                 .storage
                 .from('files')
@@ -38,7 +52,7 @@ exports.fileUploadPost = [
                 data: {
                     name: originalname,
                     type: mimetype,
-                    sizeKB: size / 1000,
+                    sizeKB: fileSizeKB,
                     owner: { connect: { id: req.user.id } },
                     parentFolder: { connect: { id: parentFolderId } }
                 }
@@ -304,9 +318,6 @@ exports.deleteFileDelete = [
                 data: { memoryUsedKB: { decrement: fileToDelete.sizeKB } }
             })
 
-            // const fiveMBinKB = 5 * 1000 * 1000 / 1000 
-            const fiveMBinKB = 1400;
-
             let trashFiles;
             if (addTrashMemory.sizeKB > fiveMBinKB) {
                 const memoryToDelete = addTrashMemory.sizeKB - fiveMBinKB;
@@ -317,7 +328,6 @@ exports.deleteFileDelete = [
                     },
                     orderBy: { deletedAt: 'asc' }
                 })
-                // trashFiles.forEach(file => file.name)
 
                 let deletedKB = 0;
                 let deletedFiles = [];
