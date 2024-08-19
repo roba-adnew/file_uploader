@@ -23,7 +23,7 @@ exports.postFileUpload = [
         debug('file details: %O', req.file)
         const { originalname, buffer, mimetype, size } = req.file;
         const { parentFolderId } = req.body;
-        const fileSizeKB = size / 1000;
+        const fileSizeKB = parseFloat(size / 1000, 3);
 
         try {
             const user = await prisma.user.findFirst({
@@ -147,7 +147,7 @@ exports.getFileDetails = [
             const fileDetails = await prisma.file.findFirst({
                 where: { id: fileId }
             })
-            if (fileDetails.deleted) {
+            if (fileDetails.deletedFile) {
                 return res
                     .status(404)
                     .json({ message: "file has been deleted" })
@@ -325,16 +325,13 @@ exports.deleteFile = [
         debug('commencing file deletion')
 
         try {
-            const fileToDelete = await prisma.file.findFirst({
-                where: { id: fileId }
-            })
             const trashFolder = await prisma.folder.findFirst({
                 where: { userId: req.user.id, isTrash: true }
 
             })
-            const folderLineage = await getFolderIdLineage(fileToDelete)
+            const folderLineage = await getFolderIdLineage(fileId)
 
-            const deleted = await prisma.file.update({
+            const deletedFile = await prisma.file.update({
                 where: { id: fileToDelete.id },
                 data: {
                     deleted: true,
@@ -408,7 +405,7 @@ exports.deleteFile = [
                 }
             }
 
-            debug('DB deleted file', deleted)
+            debug('DB deleted file', deletedFile)
             debug('trash folder memory increase', addTrashMemory)
             debug('folder memory reduction results', folderUpdates)
             debug('user memory update', userUpdate)
