@@ -3,16 +3,16 @@ const fileContr = require('../controllers/fileContr')
 
 const router = express.Router();
 
-router.get('/sb', fileContr.sbDownloadGet)
+router.get('/download', fileContr.getFile)
 
-router.get('/', fileContr.readFileGet)
+router.get('/', fileContr.getFileDetails)
 
-router.post('/', fileContr.fileUploadPost)
+router.post('/', fileContr.postFileUpload)
 
 router.put('/name', fileContr.updateFileNamePut)
 
 router.put('/location', fileContr.updateFileLocationPut)
 
-router.delete('/', fileContr.deleteFileDelete)
+router.delete('/', fileContr.deleteFile)
 
 module.exports = router

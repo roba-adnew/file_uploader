@@ -14,9 +14,9 @@ const supabase = createClient(process.env.SB_API_URL, process.env.SB_API_KEY)
 
 const upload = multer({ storage: multer.memoryStorage() })
 
-const fiveMBinKB = 5 * 1000 * 1000 / 1000 
+const fiveMBinKB = 5 * 1000 * 1000 / 1000
 
-exports.fileUploadPost = [
+exports.postFileUpload = [
     upload.single('uploaded_file'),
     checkAuth,
     async (req, res, next) => {
@@ -34,7 +34,8 @@ exports.fileUploadPost = [
             if (user.memoryUsedKB + fileSizeKB > fiveMBinKB) {
                 return res
                     .status(405)
-                    .json({ message: "memory limit exceeded. \
+                    .json({
+                        message: "memory limit exceeded. \
                         try a smaller file or deleting a current file" })
             }
             const { data, error } = await supabase
@@ -88,7 +89,49 @@ exports.fileUploadPost = [
     }
 ]
 
-exports.readFileGet = [
+exports.getFile = [
+    checkAuth,
+    async (req, res, next) => {
+        try {
+            const { fileId } = req.body;
+            const fileDetails = await prisma.file.update({
+                where: { id: fileId },
+                data: { downloads: { increment: 1 } }
+            })
+            const fileName = fileDetails.name
+            const { data, error } = await supabase
+                .storage
+                .from('files')
+                .download(fileName)
+
+            const fileObject = new File([data], fileName)
+            const file = Buffer.from(await fileObject.arrayBuffer())
+
+            debug('sb data raw:%O', data)
+            debug('sb download file object:%O', fileObject)
+            debug('sb download buffered file:%O', file)
+
+            res.setHeader('Content-Type', data.type)
+            res.setHeader(
+                'Content-Disposition',
+                `attachment; filename="${fileObject.name}"`
+            )
+
+            if (error) {
+                debug('Error downloading from Supabase:', error)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to download file' })
+            }
+            return res.status(200).send(file)
+              
+        } catch (error) {
+            debug('unexpected error downloading from supabase', error)
+        }
+    }
+]
+
+exports.getFileDetails = [
     checkAuth,
     async (req, res, next) => {
         const { fileId } = req.body;
@@ -114,45 +157,6 @@ exports.readFileGet = [
     }
 ]
 
-exports.sbDownloadGet = [
-    checkAuth,
-    async (req, res, next) => {
-        try {
-            const fileName = 'sb_pic_orig.png';
-            const { data, error } = await supabase
-                .storage
-                .from('files')
-                .getPublicUrl(fileName)
-
-                // .createSignedUrl(fileName, 600)
-                // .download(fileName)
-                
-            const fileObject = new File([data], fileName)
-            const file = Buffer.from(await fileObject.arrayBuffer())
-
-            debug('sb data raw:%O', data)
-            debug('sb download file object:%O', fileObject)
-            debug('sb download buffered file:%O', file)
-
-            res.setHeader('Content-Type', data.type)
-            res.setHeader(
-                'Content-Disposition', 
-                `attachment; filename="${fileObject.name}"`
-            )
-
-            if (error) {
-                debug('Error downloading from Supabase:', error)
-                return res
-                    .status(500)
-                    .json({ error: 'Failed to download file' })
-                }
-            return res.status(200).send(file)
-        } catch (error) {
-            debug('unexpected error downloading from supabase', error)
-        }
-    }
-]
-
 exports.updateFileNamePut = [
     checkAuth,
     async (req, res, next) => {
@@ -174,14 +178,14 @@ exports.updateFileNamePut = [
             const newPath =
                 path.join(__dirname, '../../public', `${newName}${ext}`)
             await fs.rename(filePath, newPath)
-            
+
 
 
             const updatedFile = await prisma.file.update({
                 where: { id: fileId },
                 data: { name: `${newName}${ext}` }
             })
-            
+
 
             debug('file name changes to ', updatedFile.name)
             res.status(200).json({ message: "file name changed" })
@@ -268,7 +272,7 @@ exports.updateFileLocationPut = [
     }
 ]
 
-exports.deleteFileDelete = [
+exports.deleteFileD = [
     checkAuth,
     async (req, res, next) => {
         const { fileId } = req.body;
@@ -322,9 +326,9 @@ exports.deleteFileDelete = [
             if (addTrashMemory.sizeKB > fiveMBinKB) {
                 const memoryToDelete = addTrashMemory.sizeKB - fiveMBinKB;
                 trashFiles = await prisma.file.findMany({
-                    where: { 
+                    where: {
                         parentFolderId: trashFolder.id,
-                        deleted: true 
+                        deleted: true
                     },
                     orderBy: { deletedAt: 'asc' }
                 })
@@ -348,7 +352,7 @@ exports.deleteFileDelete = [
                         .storage
                         .from('files')
                         .remove([file.name])
-                    
+
                     if (deletedKB >= memoryToDelete) break
                 }
             }
