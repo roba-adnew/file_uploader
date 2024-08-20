@@ -50,8 +50,14 @@ async function logout() {
 }
 
 async function checkAuth() {
-    const url = `${base_url}/check-auth`
-    const options = { credentials: 'include' }
+    const url = `${base_url}/check-auth`;
+    const options = { 
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sendResponse: true }) 
+    };
+
     try {
         const response = await fetch(url, options)
         console.log('check auth response', response)

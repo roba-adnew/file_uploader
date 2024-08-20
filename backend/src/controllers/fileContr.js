@@ -1,7 +1,7 @@
 require('dotenv').config()
 const debug = require('debug')('backend:manager')
 const multer = require('multer')
-const getAuthCheck = require('./authContr').getAuthCheck
+const postAuthCheck = require('./authContr').postAuthCheck
 const getFolderIdLineage = require('./folderContr').getFolderIdLineage;
 const { PrismaClient } = require('@prisma/client')
 const { createClient } = require('@supabase/supabase-js')
@@ -15,43 +15,35 @@ const fiveMBinKB = 5 * 1000 * 1000 / 1000
 
 exports.postFileUpload = [
     upload.single('uploaded_file'),
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         debug('file details: %O', req.file)
         const { originalname, buffer, mimetype, size } = req.file;
-        const { parentFolderId } = req.body;
-        const fileSizeKB = parseFloat(size / 1000, 3);
+        let parentFolderId = req.body.parentFolderId === undefined 
+            ? null
+            : req.body.parentFolderId;
 
+        const fileSizeKB = parseFloat(size / 1000, 3);
         try {
             const user = await prisma.user.findFirst({
                 where: { id: req.user.id }
             })
-
 
             if (user.memoryUsedKB + fileSizeKB > fiveMBinKB) {
                 return res
                     .status(405)
                     .json({
                         message: "memory limit exceeded. \
-                        try a smaller file or deleting a current file" })
-            }
-            const { data, error } = await supabase
-                .storage
-                .from('files')
-                .upload(originalname, buffer, {
-                    contentType: mimetype,
-                    upsert: false
-                })
-
-            if (error) {
-                debug('Error uploading to Supabase:', error)
-                return res
-                    .status(500)
-                    .json({ error: 'Failed to upload file' })
+                        try a smaller file or deleting a current file"
+                    })
             }
 
-            debug('sb upload (expect null): %O', data)
-            debug('sb error upload: %O', error)
+            if (!parentFolderId) {
+                const rootFolder = await prisma.folder.findFirst({
+                    where: { AND: { userId: req.user.id, isRoot: true } }
+                });
+                parentFolderId = rootFolder.id;
+            }
 
             const newFile = await prisma.file.create({
                 data: {
@@ -81,6 +73,23 @@ exports.postFileUpload = [
                 data: { memoryUsedKB: { increment: newFile.sizeKB } }
             })
 
+            const { data, error } = await supabase
+                .storage
+                .from('files')
+                .upload(originalname, buffer, {
+                    contentType: mimetype,
+                    upsert: false
+                })
+
+            if (error) {
+                debug('Error uploading to Supabase:', error)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to upload file' })
+            }
+
+            debug('sb upload: %O', data)
+            debug('sb error upload: %O', error)
             debug('file uploaded: %O', newFile)
             debug('folder memory update results', folderUpdates)
             debug('user memory update', userUpdate)
@@ -88,13 +97,18 @@ exports.postFileUpload = [
             return res.status(201).json({ message: "file uploaded", newFile })
         } catch (err) {
             debug('error uploading file: %O', err)
-            throw err
+            return res
+                .status(500)
+                .json({
+                    error: 'An unexpected error occurred',
+                    details: err.message
+                })
         }
     }
 ]
 
 exports.getFile = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         try {
             const { fileId } = req.body;
@@ -136,7 +150,7 @@ exports.getFile = [
 ]
 
 exports.getFileDetails = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         const { fileId } = req.body;
         debug(`commence file retrieval for file#${fileId}`, req.body);
@@ -159,7 +173,7 @@ exports.getFileDetails = [
 ]
 
 exports.updateFileNamePut = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         const { fileId, newName } = req.body;
         try {
@@ -177,11 +191,11 @@ exports.updateFileNamePut = [
                 .slice((fileDetails.name.lastIndexOf('.') - 1 >>> 0) + 1);
             debug('extension:', ext)
 
-            const { data: downloadData, 
+            const { data: downloadData,
                 error: downloadError } = await supabase
-                .storage
-                .from('files')
-                .download(fileDetails.name)
+                    .storage
+                    .from('files')
+                    .download(fileDetails.name)
 
             if (downloadError) {
                 debug('Error downloading from supabase for name change:'
@@ -239,7 +253,7 @@ exports.updateFileNamePut = [
 ]
 
 exports.updateFileLocationPut = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         const { fileId, newParentFolderId } = req.body
         try {
@@ -315,7 +329,7 @@ exports.updateFileLocationPut = [
 ]
 
 exports.deleteFile = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         const { fileId } = req.body;
         debug('commencing file deletion')

@@ -114,14 +114,17 @@ exports.postLogout = (req, res, next) => {
     })
 }
 
-exports.getAuthCheck = (req, res, next) => {
+exports.postAuthCheck = (req, res, next) => {
     debug('current session state: %O', req.session)
     debug('current req user state: %O', req.user)
     debug('auth stands at:', req.isAuthenticated())
-    debug('body %O', req.body)
+    debug('body: %O', req.body)
+    const { sendResponse } = req.body;
     const user = req.user;
     const authenticated = !!user && req.isAuthenticated();
     if (!authenticated) return res.status(401).json({ message:"unauthorized" });
-    res.status(200).json({ message: "user is logged in", user})
+    if (sendResponse) {
+        return res.status(200).json({ message: "user is logged in", user})
+    }
     next();
 }

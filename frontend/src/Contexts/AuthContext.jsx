@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types'
 import { 
-    logout as apiLogout, checkAuth as apiAuth } from '../utils/authApi'
+    logout as apiLogout, checkAuth as apiCheckAuth } from '../utils/authApi'
 
 const AuthContext = createContext(null)
 
@@ -15,13 +15,14 @@ function AuthProvider({ children }) {
 
     useEffect(() => {
         checkAuthorization()
-        const authInterval = setInterval(checkAuthorization, 5*60*1000)
+        const fiveMinutesMS = 5 * 60 * 1000;
+        const authInterval = setInterval(checkAuthorization, fiveMinutesMS)
         return () => clearInterval(authInterval)
     })
 
     async function checkAuthorization() {
         try {
-            const authorization = await apiAuth()
+            const authorization = await apiCheckAuth()
             if (authorization) authorize()
             if (!authorization) unAuthorize()
         } catch (err) {

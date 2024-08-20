@@ -1,6 +1,6 @@
 require('dotenv').config()
 const debug = require('debug')('backend:manager')
-const getAuthCheck = require('./authContr').getAuthCheck
+const postAuthCheck = require('./authContr').postAuthCheck
 const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
@@ -38,7 +38,7 @@ exports.getFolderIdLineage = async (fileOrId) => {
 }
 
 exports.createFolderPost = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         debug('commencing new folder creation: %O', req.body);
         const { parentFolderId, name } = req.body
@@ -69,7 +69,7 @@ exports.createFolderPost = [
 ]
 
 exports.readFolderContentsGet = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         const { folderId } = req.body;
         try {
@@ -94,7 +94,7 @@ exports.readFolderContentsGet = [
 ]
 
 exports.updateFolderNamePut = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         const { folderId, newName } = req.body;
         try {
@@ -112,7 +112,7 @@ exports.updateFolderNamePut = [
 ]
 
 exports.updateFolderLocationPut = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         try {
             const { folderId, newParentFolderId } = req.body
@@ -194,7 +194,7 @@ exports.updateFolderLocationPut = [
 ]
 
 exports.deleteFolderDelete = [
-    getAuthCheck,
+    postAuthCheck,
     async (req, res, next) => {
         const { folderId } = req.body;
         debug('commencing folder deletion')
@@ -203,6 +203,10 @@ exports.deleteFolderDelete = [
             const folderToDelete = await prisma.folder.findFirst({
                 where: { id: folderId }
             })
+            if (folderToDelete.isRoot || folderToDelete.isTrash) {
+                return res.status(405).json({ message: "You cannot delete the root or trash folder"})
+            }
+
             const trashFolder = await prisma.folder.findFirst({
                 where: { userId: req.user.id, isTrash: true }
             })

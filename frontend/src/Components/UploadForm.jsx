@@ -1,12 +1,14 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { AuthContext } from "../Contexts/AuthContext";
 import { upload as apiUpload } from '../utils/manageApi'
+import PropTypes from 'prop-types'
 
-function UploadForm() {
+function UploadForm({ folderId = null }) {
     const [file, setFile] = useState(null)
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState(null)
     const { isAuthorized } = useContext(AuthContext)
+    const fileInputRef = useRef(null)
 
     function handleFileSelection(e) { setFile(e.target.files[0])}
 
@@ -14,13 +16,14 @@ function UploadForm() {
         e.preventDefault();
         try {
             setUploading(true)
-            console.log('kicking off upload from component with', file)
-            const success = await apiUpload(file)
+            console.log('kicking off upload from component:', file, folderId)
+            const success = await apiUpload(file, folderId)
             if (success) {
                 console.log('file uploaded successfully')
+                setFile(null)
+                fileInputRef.current.value = '';
             } else {
                 console.log('upload failed')
-
             }
         } catch (err) {
             console.error(err)
@@ -47,6 +50,7 @@ function UploadForm() {
                             type="file"
                             className="form-control-file"
                             name="uploaded_file"
+                            ref={fileInputRef}
                             onChange={handleFileSelection}
                         />
                         <input
@@ -57,8 +61,10 @@ function UploadForm() {
                     </div>
                 </form>
             </div>
-            : <div>please login to play</div>
+            : <div>please login to upload</div>
     )
 }
+
+UploadForm.propTypes = { folderId: PropTypes.string }
 
 export default UploadForm;
