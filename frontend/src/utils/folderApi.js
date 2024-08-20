@@ -3,7 +3,7 @@ const domain = import.meta.env.VITE_API_DEV_URL
 const base_url = `${domain}/folder`
 
 
-async function getFolderContents(folderId) {
+async function getFolderContents(folderId = null) {
     console.log('folderId to retrieve', folderId)
     const url = `${base_url}/view`;
     const options = {
