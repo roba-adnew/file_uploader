@@ -30,4 +30,40 @@ async function upload(file, folderId) {
     }
 }
 
-export { upload }
+async function getFileDetails(fileId) {
+    const download_url = `${base_url}/download`;
+    const details_url = `${base_url}/details`;
+
+    const options = {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify({ fileId: fileId })
+    }
+    try {
+        const downloadResponse = await fetch(download_url, options)
+        const detailsResponse = await fetch(details_url, options)
+
+        if (!detailsResponse.ok) {
+            const errorData = await detailsResponse.json();
+            throw new Error(errorData.message || 'Upload failed');
+        }
+
+        if (!downloadResponse.ok) {
+            const errorData = await downloadResponse.json();
+            throw new Error(errorData.message || 'Upload failed');
+        }
+
+        // const downloadResults = await downloadResponse.json()
+        const detailsResults = await detailsResponse.json()
+        console.log('details results', detailsResults)
+        console.log('download response', downloadResponse)
+
+        return true
+    } catch (err) {
+        console.error('file details retrieval error:', err)
+        throw err
+    }
+}
+
+export { upload, getFileDetails }

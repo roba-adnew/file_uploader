@@ -3,9 +3,9 @@ const fileContr = require('../controllers/fileContr')
 
 const router = express.Router();
 
-router.get('/download', fileContr.getFile)
+router.post('/download', fileContr.getFile)
 
-router.get('/', fileContr.getFileDetails)
+router.post('/details', fileContr.getFileDetails)
 
 router.post('/', fileContr.postFileUpload)
 

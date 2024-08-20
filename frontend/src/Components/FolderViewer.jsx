@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
+import { getFileDetails } from '../utils/manageApi';
 import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
 
@@ -16,6 +17,10 @@ function FolderViewer() {
         console.log('checking that target works:', e.target.id)
         setFolderId(e.target.id)
         setRefetch(true)
+    }
+
+    async function handleFileRetrieval(e) {
+        await getFileDetails(e.target.id)
     }
 
     useEffect(() => {
@@ -70,7 +75,13 @@ function FolderViewer() {
                 <>
                     <h6>files</h6>
                     {files.map((file) => {
-                        return <p key={file.id}>{file.name}</p>
+                        return <div
+                            key={file.id}
+                            id={file.id}
+                            onClick={handleFileRetrieval}
+                        >
+                            {file.name}
+                        </div>
                     })}
                 </>
             }

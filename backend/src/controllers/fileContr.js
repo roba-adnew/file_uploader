@@ -153,7 +153,7 @@ exports.getFileDetails = [
     postAuthCheck,
     async (req, res, next) => {
         const { fileId } = req.body;
-        debug(`commence file retrieval for file#${fileId}`, req.body);
+        debug(`commence file retrieval for file #${fileId}`, req.body);
         try {
             const fileDetails = await prisma.file.findFirst({
                 where: { id: fileId }
