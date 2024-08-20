@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/view', folderContr.getFolderContentsPost)
 
-router.post('/', folderContr.createFolderPost)
+router.post('/add', folderContr.postAddFolder)
 
 router.put('/name', folderContr.updateFolderNamePut)
 

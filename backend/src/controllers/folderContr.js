@@ -37,7 +37,7 @@ exports.getFolderIdLineage = async (fileOrId) => {
     return folderLineage
 }
 
-exports.createFolderPost = [
+exports.postAddFolder = [
     postAuthCheck,
     async (req, res, next) => {
         debug('commencing new folder creation: %O', req.body);
@@ -82,7 +82,7 @@ exports.getFolderContentsPost = [
             });
             folderId = rootFolder.id;
         }
-        
+
         try {
             const results = await prisma.folder.findUnique({
                 where: { id: folderId },

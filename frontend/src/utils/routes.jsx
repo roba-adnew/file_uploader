@@ -1,5 +1,4 @@
 import App from '../App'
-import UploadForm from '../Components/UploadForm';
 import Login from '../Components/Login';
 import SignUpForm from '../Components/SignUpForm';
 import FolderViewer from '../Components/FolderViewer';
@@ -7,15 +6,11 @@ import FolderViewer from '../Components/FolderViewer';
 const routes = [
   {
     path: "/",
-    element: <App />
-    , children: [
+    element: <App />,
+    children: [
       {
         index: true,
-        element:
-          <>
-            <UploadForm />
-            <FolderViewer />
-          </>
+        element: <FolderViewer />
       },
       {
         path: "/sign-up",
