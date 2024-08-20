@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../Contexts/AuthContext";
-import { addFolder as apiAddFolder } from '../utils/folderApi'
-import PropTypes from 'prop-types'
+import { addFolder as apiAddFolder } from '../utils/folderApi';
+import PropTypes from 'prop-types';
 
 function AddFolderForm({ folderId, refetch }) {
     const [newFolderName, setNewFolderName] = useState(null)
