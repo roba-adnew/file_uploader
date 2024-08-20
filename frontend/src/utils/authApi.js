@@ -6,9 +6,7 @@ async function signup(formData) {
     const url = `${base_url}/signup`
     const options = {
         method: 'POST',
-        headers: {
-            'Content-type': 'application/json'
-        },
+        headers: { 'Content-type': 'application/json' },
         body: JSON.stringify(formData)
     }
     console.log('new account form data', formData)

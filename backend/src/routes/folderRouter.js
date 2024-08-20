@@ -3,7 +3,7 @@ const folderContr = require('../controllers/folderContr')
 
 const router = express.Router();
 
-router.get('/', folderContr.readFolderContentsGet)
+router.post('/view', folderContr.getFolderContentsPost)
 
 router.post('/', folderContr.createFolderPost)
 

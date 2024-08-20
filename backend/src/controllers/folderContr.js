@@ -68,10 +68,21 @@ exports.createFolderPost = [
     }
 ]
 
-exports.readFolderContentsGet = [
+exports.getFolderContentsPost = [
     postAuthCheck,
     async (req, res, next) => {
-        const { folderId } = req.body;
+        debug('get folder req object: %O', req.body)
+        let folderId = req.body.folderId === undefined
+            ? null
+            : req.body.folderId;
+
+        if (!folderId) {
+            const rootFolder = await prisma.folder.findFirst({
+                where: { AND: { userId: req.user.id, isRoot: true } }
+            });
+            folderId = rootFolder.id;
+        }
+        
         try {
             const results = await prisma.folder.findUnique({
                 where: { id: folderId },
@@ -119,9 +130,9 @@ exports.updateFolderLocationPut = [
             const folder = await prisma.folder.findFirst(
                 { where: { id: folderId } }
             )
-            const oldLineage = 
+            const oldLineage =
                 await exports.getFolderIdLineage(folder)
-            const newLineage = 
+            const newLineage =
                 await exports.getFolderIdLineage(newParentFolderId)
 
             const readOldLineagePromises = oldLineage.map(
@@ -132,7 +143,7 @@ exports.updateFolderLocationPut = [
                     return result;
                 }
             )
-            const readOldLineageResults = 
+            const readOldLineageResults =
                 await Promise.all(readOldLineagePromises)
 
             const readNewLineagePromises = newLineage.map(
@@ -143,7 +154,7 @@ exports.updateFolderLocationPut = [
                     return result
                 }
             )
-            const readNewLineageResults = await 
+            const readNewLineageResults = await
                 Promise.all(readNewLineagePromises);
 
             const updatedFolder = await prisma.folder.update({
@@ -204,13 +215,13 @@ exports.deleteFolderDelete = [
                 where: { id: folderId }
             })
             if (folderToDelete.isRoot || folderToDelete.isTrash) {
-                return res.status(405).json({ message: "You cannot delete the root or trash folder"})
+                return res.status(405).json({ message: "You cannot delete the root or trash folder" })
             }
 
             const trashFolder = await prisma.folder.findFirst({
                 where: { userId: req.user.id, isTrash: true }
             })
-            const folderLineage = 
+            const folderLineage =
                 await exports.getFolderIdLineage(folderToDelete)
 
             const deleted = await prisma.folder.update({
