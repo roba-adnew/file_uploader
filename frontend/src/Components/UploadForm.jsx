@@ -5,12 +5,15 @@ import PropTypes from 'prop-types'
 
 function UploadForm({ folderId = null }) {
     const [file, setFile] = useState(null)
+    const [addingFile, setAddingFile] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState(null)
     const { isAuthorized } = useContext(AuthContext)
     const fileInputRef = useRef(null)
 
-    function handleFileSelection(e) { setFile(e.target.files[0])}
+    function handleFileSelection(e) { setFile(e.target.files[0]) }
+
+    function toggleAddingFile() { setAddingFile(!addingFile) }
 
     async function uploadFile(e) {
         e.preventDefault();
@@ -31,6 +34,7 @@ function UploadForm({ folderId = null }) {
             throw err
         } finally {
             setUploading(false)
+            setAddingFile(false)
         }
     }
 
@@ -46,18 +50,32 @@ function UploadForm({ folderId = null }) {
                     method="post"
                 >
                     <div className="form-group">
-                        <input
-                            type="file"
-                            className="form-control-file"
-                            name="uploaded_file"
-                            ref={fileInputRef}
-                            onChange={handleFileSelection}
-                        />
-                        <input
-                            type="submit"
-                            value="upload"
-                            className="upload btn"
-                        />
+                        {addingFile &&
+                            <>
+                                <input
+                                    type="file"
+                                    id="fileAdder"
+                                    name="uploaded_file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileSelection}
+                                />
+                                <input
+                                    type="submit"
+                                    value="upload"
+                                    id="uploadButton"
+                                />
+                            </>
+                        }
+                        {!addingFile &&
+                            <>
+                                <input
+                                    type="button"
+                                    value="add a file"
+                                    id="addFileButton"
+                                    onClick={toggleAddingFile}
+                                />
+                            </>
+                        }
                     </div>
                 </form>
             </div>
