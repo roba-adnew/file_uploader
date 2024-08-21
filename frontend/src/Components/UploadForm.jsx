@@ -62,6 +62,12 @@ function UploadForm({ folderId = null, refetch }) {
                                     value="upload"
                                     id="uploadButton"
                                 />
+                                <input
+                                    type="button"
+                                    value="cancel"
+                                    id="cancelUploadButton"
+                                    onClick={toggleAddingFile}
+                                />
                             </>
                         }
                         {!addingFile &&

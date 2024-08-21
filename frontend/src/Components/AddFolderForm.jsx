@@ -62,6 +62,12 @@ function AddFolderForm({ folderId, refetch }) {
                                     className="toggle btn"
                                     onClick={addFolder}
                                 />
+                                <input
+                                    type="button"
+                                    value="cancel"
+                                    className="cancelNewFolderButton"
+                                    onClick={toggleAddingFolder}
+                                />
                             </>
                         }
                         {!addingFolder &&
