@@ -5,7 +5,7 @@ const base_url = `${domain}/file`
 async function upload(file, folderId) {
     const formData = new FormData();
     formData.append('uploaded_file', file);
-    if (folderId !== null) formData.append('folderId', folderId);
+    if (folderId !== null) formData.append('parentFolderId', folderId);
 
     console.log('formData:', formData)
     console.log('parentFolderID', folderId)

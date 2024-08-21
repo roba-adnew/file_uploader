@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { upload as apiUpload } from '../utils/manageApi'
 import PropTypes from 'prop-types'
 
-function UploadForm({ folderId = null }) {
+function UploadForm({ folderId = null, refetch }) {
     const [file, setFile] = useState(null)
     const [addingFile, setAddingFile] = useState(false)
     const [uploading, setUploading] = useState(false)
@@ -33,6 +33,7 @@ function UploadForm({ folderId = null }) {
         } finally {
             setUploading(false)
             setAddingFile(false)
+            refetch(true)
         }
     }
 
@@ -79,6 +80,9 @@ function UploadForm({ folderId = null }) {
     )
 }
 
-UploadForm.propTypes = { folderId: PropTypes.string }
+UploadForm.propTypes = { 
+    folderId: PropTypes.string,
+    refetch: PropTypes.func 
+}
 
 export default UploadForm;

@@ -18,6 +18,7 @@ exports.postFileUpload = [
     postAuthCheck,
     async (req, res, next) => {
         debug('file details: %O', req.file)
+        debug('parentFolder', req.body.parentFolderId)
         const { originalname, buffer, mimetype, size } = req.file;
         let parentFolderId = req.body.parentFolderId === undefined 
             ? null

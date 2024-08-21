@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { AuthContext } from '../Contexts/AuthContext';
 import { getFileDetails as apiGetFile } from '../utils/manageApi';
 import { sizeDisplay, typeDisplay } from '../utils/functions';
+import ParentFolderButton from './ParentFolderButton';
 
 function FileViewer() {
     const { isAuthorized } = useContext(AuthContext)
@@ -71,6 +72,7 @@ function FileViewer() {
     return (
         isAuthorized ?
             <>
+            <ParentFolderButton parentId={file.details.parentFolderId} />
             {file.details.type.startsWith('image') 
                ? <img src={file.content} alt={file.details.name} />
                : <div>Preview for {file.details.name} not available </div>

@@ -1,31 +1,11 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import PropTypes from 'prop-types'
 import { AuthContext } from '../Contexts/AuthContext';
 import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
 import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
-
-function ParentFolderButton({ parentId }) {
-    const [name, setName] = useState(null)
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        async function getParentFolder() {
-            const contents = await apiGetFolderContents(parentId)
-            setName(contents.name)
-        }
-        getParentFolder()
-    })
-
-    function loadParentFolder() { navigate('/', { state: { id: parentId } }) }
-
-    return (
-        <div id="parentFolder" onClick={loadParentFolder}>
-            {name}
-        </div>
-    )
-}
+import ParentFolderButton from './ParentFolderButton';
+import '../Styles/FolderViewer.css'
 
 function FolderViewer() {
     const [folderId, setFolderId] = useState(null)
@@ -89,7 +69,6 @@ function FolderViewer() {
 
         isAuthorized ?
             <div id='folderViewer'>
-
                 {parentFolderId !== undefined && parentFolderId !== null  &&
                     <ParentFolderButton parentId={parentFolderId} />}
 
@@ -130,9 +109,5 @@ function FolderViewer() {
             : <div>please login to continue</div>
     )
 }
-
-FolderViewer.propTypes = { id: PropTypes.string }
-ParentFolderButton.propTypes = { parentId: PropTypes.string }
-
 
 export default FolderViewer
