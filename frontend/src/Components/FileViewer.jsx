@@ -9,7 +9,7 @@ function FileViewer() {
     const { isAuthorized } = useContext(AuthContext)
     const [file, setFile] = useState(null)
     let location = useLocation();
-    const fileId = location.state.key;
+    const fileId = location.state?.key;
 
     useEffect(() => {
         async function getFile() {

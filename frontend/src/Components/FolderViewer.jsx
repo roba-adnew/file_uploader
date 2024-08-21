@@ -1,13 +1,38 @@
 import { useState, useEffect, useContext } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types'
 import { AuthContext } from '../Contexts/AuthContext';
 import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
 import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
 
+function ParentFolderButton({ parentId }) {
+    const [name, setName] = useState(null)
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        async function getParentFolder() {
+            const contents = await apiGetFolderContents(parentId)
+            setName(contents.name)
+        }
+        getParentFolder()
+    })
+
+    function loadParentFolder() { navigate('/', { state: { id: parentId } }) }
+
+
+    return (
+        <div id="parentFolder" onClick={loadParentFolder}>
+            {name}
+        </div>
+    )
+
+
+}
 
 function FolderViewer() {
     const [folderId, setFolderId] = useState(null)
+    const [parentFolderId, setParentFolderId] = useState(null)
     const [folderName, setFolderName] = useState(null)
     const [subFolders, setSubFolders] = useState([])
     const [files, setFiles] = useState([])
@@ -15,14 +40,14 @@ function FolderViewer() {
     const [error, setError] = useState(null)
     const { isAuthorized } = useContext(AuthContext)
     const navigate = useNavigate()
+    const location = useLocation()
 
-
-    function loadNewFolder(e) {
-        setFolderId(e.target.id)
-        setRefetch(true)
-    }
-
-    function loadFile(e) { navigate('/file', { state: { key: e.target.id }} ) }
+    useEffect(() => {
+        if (location.state && location.state.id) {
+            setFolderId(location.state.id)
+            setRefetch(true)
+        }
+    }, [location])
 
     useEffect(() => {
         async function loadFolderContents() {
@@ -34,6 +59,7 @@ function FolderViewer() {
                 setFolderId(contents.id)
                 setSubFolders(contents.childFolders)
                 setFiles(contents.files)
+                setParentFolderId(contents.parentFolderId)
                 setRefetch(false)
             } catch (err) {
                 setError(err)
@@ -43,22 +69,38 @@ function FolderViewer() {
         loadFolderContents()
     }, [refetch, folderId])
 
+    function loadNewFolder(e) {
+        setFolderId(e.target.id)
+        setRefetch(true)
+    }
+
+    function loadFile(e) { navigate('/file', { state: { key: e.target.id } }) }
+
     if (!files || !subFolders) return <div>issue loading</div>
 
     console.log('Render state:', {
         folderId,
+        parentFolderId,
         folderName,
         subFolders,
         files,
         error
     });
+
+    console.log('parent exists', !!parentFolderId)
     return (
 
         isAuthorized ?
             <div id='folderViewer'>
+
+                {parentFolderId !== undefined && parentFolderId !== null  &&
+                    <ParentFolderButton parentId={parentFolderId} />}
+
                 <h4>{folderName}</h4>
+
                 <UploadForm folderId={folderId} refetch={setRefetch} />
                 <AddFolderForm folderId={folderId} refetch={setRefetch} />
+
                 {subFolders.length > 0 &&
                     <>
                         <h6>folders</h6>
@@ -91,5 +133,9 @@ function FolderViewer() {
             : <div>please login to continue</div>
     )
 }
+
+FolderViewer.propTypes = { id: PropTypes.string }
+ParentFolderButton.propTypes = { parentId: PropTypes.string }
+
 
 export default FolderViewer
