@@ -44,22 +44,16 @@ async function getFileDetails(fileId) {
         const downloadResponse = await fetch(download_url, options)
         const detailsResponse = await fetch(details_url, options)
 
-        if (!detailsResponse.ok) {
-            const errorData = await detailsResponse.json();
-            throw new Error(errorData.message || 'Upload failed');
-        }
-
-        if (!downloadResponse.ok) {
-            const errorData = await downloadResponse.json();
-            throw new Error(errorData.message || 'Upload failed');
-        }
-
-        // const downloadResults = await downloadResponse.json()
+        const blob = await downloadResponse.blob();
+        const content = URL.createObjectURL(blob);
         const detailsResults = await detailsResponse.json()
-        console.log('details results', detailsResults)
-        console.log('download response', downloadResponse)
 
-        return true
+        const file = {
+            content: content,
+            details: detailsResults
+        }
+
+        return file
     } catch (err) {
         console.error('file details retrieval error:', err)
         throw err

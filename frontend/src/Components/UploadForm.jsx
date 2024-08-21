@@ -1,5 +1,4 @@
-import { useState, useContext, useRef } from "react";
-import { AuthContext } from "../Contexts/AuthContext";
+import { useState, useRef } from "react";
 import { upload as apiUpload } from '../utils/manageApi'
 import PropTypes from 'prop-types'
 
@@ -8,7 +7,6 @@ function UploadForm({ folderId = null }) {
     const [addingFile, setAddingFile] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState(null)
-    const { isAuthorized } = useContext(AuthContext)
     const fileInputRef = useRef(null)
 
     function handleFileSelection(e) { setFile(e.target.files[0]) }
@@ -41,7 +39,6 @@ function UploadForm({ folderId = null }) {
     console.log('Render state:', { file, uploading, error });
 
     return (
-        isAuthorized ?
             <div>
                 <form
                     action="/stats"
@@ -79,7 +76,6 @@ function UploadForm({ folderId = null }) {
                     </div>
                 </form>
             </div>
-            : <div>please login to upload</div>
     )
 }
 
