@@ -23,6 +23,17 @@ function FileViewer() {
         return <div>No file data available</div>;
     }
 
+    function handleDownload() {
+        if (file && file.content) {
+            const link = document.createElement('a');
+            link.href = file.content;
+            link.download = file.details.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
     const FileDetails = () => ( 
         file.details
         ? <table>
@@ -60,9 +71,14 @@ function FileViewer() {
     return (
         isAuthorized ?
             <>
-                <img src={file.content} alt={file.details.name} />
+            {file.details.type.startsWith('image') 
+               ? <img src={file.content} alt={file.details.name} />
+               : <div>Preview for {file.details.name} not available </div>
+            }
                 <FileDetails />
-                <div></div>
+                <button onClick={handleDownload} className="download-button">
+                    Download {file.details.name}
+                </button>
             </>
             : <div>please login to view file</div>
     )

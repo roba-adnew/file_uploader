@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types'
 import { AuthContext } from '../Contexts/AuthContext';
 import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
@@ -20,14 +20,11 @@ function ParentFolderButton({ parentId }) {
 
     function loadParentFolder() { navigate('/', { state: { id: parentId } }) }
 
-
     return (
         <div id="parentFolder" onClick={loadParentFolder}>
             {name}
         </div>
     )
-
-
 }
 
 function FolderViewer() {
