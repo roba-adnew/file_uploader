@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { LuFolderOutput } from "react-icons/lu";
 import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
+import '../Styles/FolderViewer.css'
 
 function ParentFolderButton({ parentId }) {
     const [name, setName] = useState(null)
@@ -19,7 +21,7 @@ function ParentFolderButton({ parentId }) {
 
     return (
         <div id='parentFolder' onClick={loadParentFolder}>
-            {name}
+            <LuFolderOutput /> {name}
         </div>
     )
 }

@@ -5,6 +5,7 @@ import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
 import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
 import ParentFolderButton from './ParentFolderButton';
+import { CiFolderOn, CiFileOn } from "react-icons/ci";
 import '../Styles/FolderViewer.css'
 
 function FolderViewer() {
@@ -69,43 +70,43 @@ function FolderViewer() {
 
         isAuthorized ?
             <div id='folderViewer'>
-                {parentFolderId !== undefined && parentFolderId !== null  &&
-                    <ParentFolderButton parentId={parentFolderId} />}
-
                 <h4>{folderName}</h4>
 
-                <UploadForm folderId={folderId} refetch={setRefetch} />
-                <AddFolderForm folderId={folderId} refetch={setRefetch} />
-
+                {parentFolderId !== undefined && parentFolderId !== null  &&
+                    <ParentFolderButton parentId={parentFolderId} />}
+                    
                 {subFolders.length > 0 &&
                     <>
-                        <h6>folders</h6>
                         {subFolders.map((folder) => {
                             return <div
                                 key={folder.id}
                                 id={folder.id}
+                                className="folderRow"
                                 onClick={loadNewFolder}
                             >
-                                {folder.name}
+                                <CiFolderOn />  {folder.name}
                             </div>
                         })}
                     </>
                 }
                 {files.length > 0 &&
                     <>
-                        <h6>files</h6>
                         {files.map((file) => {
                             return <div
                                 key={file.id}
                                 id={file.id}
+                                className="fileRow"
                                 onClick={loadFile}
                             >
-                                {file.name}
+                                <CiFileOn />  {file.name}
                             </div>
                         })}
                     </>
                 }
+                <UploadForm folderId={folderId} refetch={setRefetch} />
+                <AddFolderForm folderId={folderId} refetch={setRefetch} />
             </div>
+            
             : <div>please login to continue</div>
     )
 }
