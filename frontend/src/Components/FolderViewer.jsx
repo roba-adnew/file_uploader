@@ -25,16 +25,14 @@ function FolderViewer() {
         if (location.state && location.state.id) {
             setFolderId(location.state.id)
         }
-    }, [location])
+    }, [location.state])
 
     useEffect(() => {
         async function loadFolderContents() {
             console.log('commencing folder content retrieval')
             try {
                 console.log('folder to get', folderId)
-                const contents = folderId
-                    ? await apiGetFolderContents(folderId)
-                    : await apiGetFolderContents(location.state.id);
+                const contents = await apiGetFolderContents(folderId)
                 setFolderId(contents.id);
                 setFolderName(contents.name)
                 setSubFolders(contents.childFolders)
@@ -47,7 +45,7 @@ function FolderViewer() {
             }
         }
         loadFolderContents()
-    }, [folderId, location.state])
+    }, [folderId])
 
     function loadNewFolder(e) {
         setFolderId(e.target.id)
