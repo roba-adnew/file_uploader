@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { upload as apiUpload } from '../utils/manageApi'
+import { uploadFile as apiUploadFile } from '../utils/manageApi'
 import PropTypes from 'prop-types'
 
 function UploadForm({ folderId = null, refetch }) {
@@ -18,7 +18,7 @@ function UploadForm({ folderId = null, refetch }) {
         try {
             setUploading(true)
             console.log('kicking off upload from component:', file, folderId)
-            const success = await apiUpload(file, folderId)
+            const success = await apiUploadFile(file, folderId)
             if (success) {
                 console.log('file uploaded successfully')
                 setFile(null)

@@ -2,7 +2,7 @@ const domain = import.meta.env.VITE_API_DEV_URL
     || import.meta.env.VITE_API_PROD_URL
 const base_url = `${domain}/file`
 
-async function upload(file, folderId) {
+async function uploadFile(file, folderId) {
     const formData = new FormData();
     formData.append('uploaded_file', file);
     if (folderId !== null) formData.append('parentFolderId', folderId);
@@ -60,4 +60,22 @@ async function getFileDetails(fileId) {
     }
 }
 
-export { upload, getFileDetails }
+async function deleteFile(fileId) {
+    const url = base_url
+    const options = {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify({ fileId: fileId })
+    }
+    try {
+        const response = await fetch(url, options)
+        const results = await response.json()
+        return results
+    } catch (err) {
+        console.error('file deletion error:', err)
+        throw err
+    }
+}
+
+export { uploadFile, getFileDetails, deleteFile }

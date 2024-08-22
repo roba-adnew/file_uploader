@@ -11,21 +11,22 @@ function toJSONObject(object) {
     }))
 }
 
-exports.getFolderIdLineage = async (fileOrId) => {
-    debug('lineage input: %O', fileOrId)
-    const fileId = typeof fileOrId === 'string' ? fileOrId : fileOrId.parentFolderId;
-    debug('lineage input update: %O', fileId)
-    const folderLineage = [fileId]
+exports.getFolderIdLineage = async (parentFolderId) => {
+    debug('lineage input update: %O', parentFolderId)
+    const folderLineage = [parentFolderId]
     let parentFolderExists = true;
     let i = 0;
     try {
         do {
+            debug(`folder lineage i=0`, folderLineage[i])
             const folder = await prisma.folder.findFirst({
                 where: { id: folderLineage[i] },
                 include: { parentFolder: true }
             })
-            debug(`#${i} folder lookup`, folder)
-            parentFolderExists = !!folder.parentFolder;
+            debug(`#${i+1} folder lookup`, folder)
+            debug('parentFolderExists:', !!folder.parentFolder)
+            debug('lineage isRoot: ', folder.isRoot)
+            parentFolderExists = !!folder.parentFolder && !folder.isRoot;
             if (parentFolderExists) {
                 i = folderLineage.push(folder.parentFolderId) - 1;
             }
@@ -131,7 +132,7 @@ exports.updateFolderLocationPut = [
                 { where: { id: folderId } }
             )
             const oldLineage =
-                await exports.getFolderIdLineage(folder)
+                await exports.getFolderIdLineage(folder.parentFolderId)
             const newLineage =
                 await exports.getFolderIdLineage(newParentFolderId)
 

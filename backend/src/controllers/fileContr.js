@@ -336,11 +336,26 @@ exports.deleteFile = [
         debug('commencing file deletion')
 
         try {
+            const fileToDelete = await prisma.file.findFirst({
+                where: { id: fileId },
+                include: { parentFolder: true}
+            })
             const trashFolder = await prisma.folder.findFirst({
                 where: { userId: req.user.id, isTrash: true }
 
             })
-            const folderLineage = await getFolderIdLineage(fileId)
+
+            const folderLineage = await getFolderIdLineage(fileToDelete.parentFolderId)
+            const reduceMemoryFolderPromises = folderLineage.map(
+                async (folderId) => {
+                    const result = await prisma.folder.update({
+                        where: { id: folderId },
+                        data: { sizeKB: { decrement: fileToDelete.sizeKB } }
+                    })
+                    return result;
+                }
+            )
+            const folderUpdates = await Promise.all(reduceMemoryFolderPromises)
 
             const deletedFile = await prisma.file.update({
                 where: { id: fileToDelete.id },
@@ -356,20 +371,10 @@ exports.deleteFile = [
             })
             const addTrashMemory = await prisma.folder.update({
                 where: { id: trashFolder.id },
-                data: { sizeKB: { increment: fileToDelete.sizeKB } }
+                data: { sizeKB: { increment: deletedFile.sizeKB } }
             })
 
             debug('trash folder post update: %O', addTrashMemory)
-            const reduceMemoryFolderPromises = folderLineage.map(
-                async (folderId) => {
-                    const result = await prisma.folder.update({
-                        where: { id: folderId },
-                        data: { sizeKB: { decrement: fileToDelete.sizeKB } }
-                    })
-                    return result;
-                }
-            )
-            const folderUpdates = await Promise.all(reduceMemoryFolderPromises)
 
             const userUpdate = await prisma.user.update({
                 where: { id: fileToDelete.userId },

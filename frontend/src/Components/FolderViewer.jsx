@@ -52,7 +52,7 @@ function FolderViewer() {
         setRefetch(true)
     }
 
-    function loadFile(e) { navigate('/file', { state: { key: e.target.id } }) }
+    function loadFile(e) { navigate('/file', { state: { id: e.target.id } }) }
 
     if (!files || !subFolders) return <div>issue loading</div>
 
@@ -74,7 +74,7 @@ function FolderViewer() {
 
                 {parentFolderId !== undefined && parentFolderId !== null  &&
                     <ParentFolderButton parentId={parentFolderId} />}
-                    
+
                 {subFolders.length > 0 &&
                     <>
                         {subFolders.map((folder) => {
