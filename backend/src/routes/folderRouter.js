@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.post('/view', folderContr.getFolderContentsPost)
 
+router.get('/trash', folderContr.getTrashContents)
+
 router.post('/add', folderContr.postAddFolder)
 
 router.put('/name', folderContr.updateFolderNamePut)

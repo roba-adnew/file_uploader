@@ -77,14 +77,14 @@ exports.getFolderContentsPost = [
             ? null
             : req.body.folderId;
 
-        if (!folderId) {
-            const rootFolder = await prisma.folder.findFirst({
-                where: { AND: { userId: req.user.id, isRoot: true } }
-            });
-            folderId = rootFolder.id;
-        }
-
         try {
+            if (!folderId) {
+                const rootFolder = await prisma.folder.findFirst({
+                    where: { AND: { userId: req.user.id, isRoot: true } }
+                });
+                folderId = rootFolder.id;
+            }
+    
             const results = await prisma.folder.findUnique({
                 where: { id: folderId },
                 include: {
@@ -100,6 +100,26 @@ exports.getFolderContentsPost = [
             return res.status(200).json({ results: allChildren })
         } catch (err) {
             debug('error getting folder contents: %O', err)
+            throw err
+        }
+    }
+]
+
+exports.getTrashContents = [
+    postAuthCheck,
+    async (req, res, next) => {
+        try {
+            const trashFolder = await prisma.folder.findFirst({
+                where: { userId: req.user.id, isTrash: true },
+                include: {
+                    childFolders: true,
+                    files: true
+                }
+            })
+            const trashFolderJSON = toJSONObject(trashFolder)
+            return res.status(200).json({ results: trashFolderJSON})
+        } catch (err) {
+            console.error(err)
             throw err
         }
     }
