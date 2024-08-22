@@ -25,7 +25,7 @@ function FolderViewer() {
         if (location.state?.id) {
             setFolderId(location.state.id)
         }
-    }, [location.state])
+    }, [location])
 
     useEffect(() => {
         async function loadFolderContents() {

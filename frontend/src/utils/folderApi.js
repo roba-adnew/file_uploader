@@ -31,6 +31,21 @@ async function getFolderContents(folderId = null) {
     }
 }
 
+async function getTrashContents() {
+    const url = `${base_url}/trash`;
+    const options = { method: "POST", credentials: "include" }
+    try {
+        const response = await fetch(url, options)
+        console.log('trash response', response)
+        const contents = await response.json();
+        console.log('trash results', contents.results)
+        return contents.results
+    } catch (err) {
+        console.error('upload error:', err)
+        throw err
+    }
+}
+
 async function addFolder(parentFolderId, folderName) {
     const newFolderDetails = {
         name: folderName,
@@ -59,4 +74,4 @@ async function addFolder(parentFolderId, folderName) {
     }
 }
 
-export { getFolderContents, addFolder }
+export { getFolderContents, addFolder, getTrashContents }

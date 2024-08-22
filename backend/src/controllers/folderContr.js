@@ -105,7 +105,7 @@ exports.getFolderContentsPost = [
     }
 ]
 
-exports.getTrashContents = [
+exports.getTrashContentsPost = [
     postAuthCheck,
     async (req, res, next) => {
         try {
@@ -117,7 +117,7 @@ exports.getTrashContents = [
                 }
             })
             const trashFolderJSON = toJSONObject(trashFolder)
-            return res.status(200).json({ results: trashFolderJSON})
+            return res.status(200).json({ results: trashFolderJSON })
         } catch (err) {
             console.error(err)
             throw err

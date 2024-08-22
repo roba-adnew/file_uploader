@@ -3,6 +3,7 @@ import Login from '../Components/Login';
 import SignUpForm from '../Components/SignUpForm';
 import FolderViewer from '../Components/FolderViewer';
 import FileViewer from '../Components/FileViewer';
+import TrashFolderViewer from '../Components/TrashFolderViewer';
 
 const routes = [
   {
@@ -14,10 +15,6 @@ const routes = [
         element: <FolderViewer />
       },
       {
-        path: "/file",
-        element: <FileViewer />
-      },
-      {
         path: "/sign-up",
         element: <SignUpForm />,
       },
@@ -25,6 +22,14 @@ const routes = [
         path: "/login",
         element: <Login />,
       },
+      {
+        path: "/file",
+        element: <FileViewer />
+      },
+      {
+        path: "/trash",
+        element: <TrashFolderViewer />
+      }
     ]
   }
 ];
