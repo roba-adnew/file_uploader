@@ -108,11 +108,13 @@ function SignUpForm() {
                     <input
                         value={userInfo.password}
                         name='password'
+                        type='password'
                         placeholder='password'
                         onChange={updateUserInfo}
                     />
                     <input
                         name='pwdConf'
+                        type='password'
                         placeholder='re-enter password'
                         onBlur={checkPwdConf}
                     />

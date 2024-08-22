@@ -20,8 +20,6 @@ function FolderViewer() {
     const navigate = useNavigate()
     const location = useLocation()
 
-    console.log('location state', location.state)
-    console.log('id', location.state.id)
     useEffect(() => {
         if (location.state && location.state.id) {
             setFolderId(location.state.id)
@@ -48,7 +46,7 @@ function FolderViewer() {
             }
         }
         loadFolderContents()
-    }, [folderId, location.state.id])
+    }, [folderId, location.state])
 
     function loadNewFolder(e) {
         setFolderId(e.target.id)
@@ -67,9 +65,7 @@ function FolderViewer() {
         error
     });
 
-    console.log('parent exists', !!parentFolderId)
     return (
-
         isAuthorized ?
             <div id='folderViewer'>
                 <h4>{folderName}</h4>

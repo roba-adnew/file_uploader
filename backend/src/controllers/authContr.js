@@ -88,13 +88,25 @@ exports.postSignup = [
 
 exports.postLogin = [
     passport.authenticate('local'),
-    (req, res) => {
+    async (req, res) => {
         if (req.isAuthenticated()) {
             debug('User after authentication:', req.user);
             debug('Session after authentication:', req.session);
-            return res
-                .status(200)
-                .json({ user: req.session.user, message: "logged in" })
+            try {
+                const rootFolder = await prisma.folder.findFirst({
+                    where: { userId: req.user.id, isRoot: true }
+                })
+                return res
+                    .status(200)
+                    .json({
+                        user: req.session.user,
+                        message: "logged in",
+                        rootFolderId: rootFolder.id
+                    })
+            } catch (err) {
+                console.error(err)
+                throw (err)
+            }
         }
         return res
             .status(403)
@@ -122,9 +134,9 @@ exports.postAuthCheck = (req, res, next) => {
     const { sendResponse } = req.body;
     const user = req.user;
     const authenticated = !!user && req.isAuthenticated();
-    if (!authenticated) return res.status(401).json({ message:"unauthorized" });
+    if (!authenticated) return res.status(401).json({ message: "unauthorized" });
     if (sendResponse) {
-        return res.status(200).json({ message: "user is logged in", user})
+        return res.status(200).json({ message: "user is logged in", user })
     }
     next();
 }

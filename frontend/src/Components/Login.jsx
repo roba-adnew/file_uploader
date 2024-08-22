@@ -26,8 +26,8 @@ function Login() {
             console.log('logging in, credentials:', credentials)
             const response = await apiLogin(credentials)
             if (response.ok) authorize()
-            console.log('response', response)
-            navigate('/')
+            console.log('login response', response)
+            navigate('/', { state: { id: response.folderId } })
         } catch (err) {
             setError(err)
             console.error(err)

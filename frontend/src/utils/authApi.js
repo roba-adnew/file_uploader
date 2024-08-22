@@ -27,7 +27,7 @@ async function login(loginDetails) {
         console.log('logging in for', loginDetails)
         const response = await fetch(url, options)
         const data = await response.json()
-        console.log(data)
+        console.log('login response data', data)
         return response
     } catch (err) {
         console.error(err)
