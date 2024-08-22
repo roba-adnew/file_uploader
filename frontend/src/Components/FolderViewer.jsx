@@ -51,6 +51,10 @@ function FolderViewer() {
 
     function loadFile(e) { navigate('/file', { state: { id: e.target.id } }) }
 
+    function goToTrash() { 
+        navigate('/trash', { state: { lastFolderId: folderId } }) 
+    }
+
     if (!files || !subFolders) return <div>issue loading</div>
 
     console.log('Render state:', {
@@ -101,6 +105,7 @@ function FolderViewer() {
                 }
                 <UploadForm folderId={folderId} refetch={setRefetch} />
                 <AddFolderForm folderId={folderId} refetch={setRefetch} />
+                <button type="button" onClick={goToTrash}>view trash</button>
             </div>
 
             : <div>please login to continue</div>
