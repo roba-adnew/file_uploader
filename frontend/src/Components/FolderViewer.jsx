@@ -22,7 +22,7 @@ function FolderViewer() {
     const location = useLocation()
 
     useEffect(() => {
-        if (location.state.id) {
+        if (location.state?.id) {
             setFolderId(location.state.id)
         }
     }, [location.state])
