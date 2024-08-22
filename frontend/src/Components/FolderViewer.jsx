@@ -45,7 +45,7 @@ function FolderViewer() {
             }
         }
         loadFolderContents()
-    }, [folderId])
+    }, [refetch, folderId])
 
     function loadNewFolder(e) { setFolderId(e.target.id) }
 
