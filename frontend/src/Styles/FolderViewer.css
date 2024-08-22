@@ -26,9 +26,19 @@
 
 #parentFolder {
     width: 100%;
-    background-color: rgb(215, 215, 215);
+    background-color: rgb(85, 85, 85);
+    color: white;
     text-align: left;
     text-indent: 0.3rem;
+    padding: 0.2rem 0rem 0.2rem 0rem;
+    border: 0.5px solid rgb(82, 82, 82);
+}
+
+.currentFolder {
+    width: 100%;
+    background-color: black;
+    color: white;
+    text-align: left;
     padding: 0.2rem 0rem 0.2rem 0rem;
     border: 0.5px solid rgb(82, 82, 82);
 }

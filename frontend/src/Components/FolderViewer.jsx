@@ -6,6 +6,7 @@ import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
 import ParentFolderButton from './ParentFolderButton';
 import { CiFolderOn, CiFileOn } from "react-icons/ci";
+import { FaFolderOpen } from "react-icons/fa";
 import '../Styles/FolderViewer.css'
 
 function FolderViewer() {
@@ -68,10 +69,11 @@ function FolderViewer() {
     return (
         isAuthorized ?
             <div id='folderViewer'>
-                <h4>{folderName}</h4>
-
                 {parentFolderId !== undefined && parentFolderId !== null
                     && <ParentFolderButton parentId={parentFolderId} />}
+                <div className='currentFolder'>
+                    <FaFolderOpen /> {folderName}
+                </div>
 
                 {subFolders.length > 0 &&
                     <>
