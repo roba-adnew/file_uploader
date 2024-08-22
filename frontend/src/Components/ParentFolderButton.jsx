@@ -9,6 +9,7 @@ function ParentFolderButton({ parentId }) {
     const [name, setName] = useState(null)
     const navigate = useNavigate()
 
+    console.log('parent ID in button:', parentId)
     useEffect(() => {
         async function getParentFolder() {
             const contents = await apiGetFolderContents(parentId)

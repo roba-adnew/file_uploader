@@ -20,10 +20,11 @@ function FolderViewer() {
     const navigate = useNavigate()
     const location = useLocation()
 
+    console.log('location state', location.state)
+    console.log('id', location.state.id)
     useEffect(() => {
         if (location.state && location.state.id) {
             setFolderId(location.state.id)
-            setRefetch(true)
         }
     }, [location])
 
@@ -32,9 +33,11 @@ function FolderViewer() {
             console.log('commencing folder content retrieval')
             try {
                 console.log('folder to get', folderId)
-                const contents = await apiGetFolderContents(folderId)
+                const contents = folderId
+                    ? await apiGetFolderContents(folderId)
+                    : await apiGetFolderContents(location.state.id);
+                setFolderId(contents.id);
                 setFolderName(contents.name)
-                setFolderId(contents.id)
                 setSubFolders(contents.childFolders)
                 setFiles(contents.files)
                 setParentFolderId(contents.parentFolderId)
@@ -45,11 +48,10 @@ function FolderViewer() {
             }
         }
         loadFolderContents()
-    }, [refetch, folderId])
+    }, [folderId, location.state.id])
 
     function loadNewFolder(e) {
         setFolderId(e.target.id)
-        setRefetch(true)
     }
 
     function loadFile(e) { navigate('/file', { state: { id: e.target.id } }) }
@@ -72,8 +74,8 @@ function FolderViewer() {
             <div id='folderViewer'>
                 <h4>{folderName}</h4>
 
-                {parentFolderId !== undefined && parentFolderId !== null  &&
-                    <ParentFolderButton parentId={parentFolderId} />}
+                {parentFolderId !== undefined && parentFolderId !== null
+                    && <ParentFolderButton parentId={parentFolderId} />}
 
                 {subFolders.length > 0 &&
                     <>
@@ -106,7 +108,7 @@ function FolderViewer() {
                 <UploadForm folderId={folderId} refetch={setRefetch} />
                 <AddFolderForm folderId={folderId} refetch={setRefetch} />
             </div>
-            
+
             : <div>please login to continue</div>
     )
 }
