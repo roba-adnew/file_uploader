@@ -22,7 +22,7 @@ function FolderViewer() {
     const location = useLocation()
 
     useEffect(() => {
-        if (location.state && location.state.id) {
+        if (location.state.id) {
             setFolderId(location.state.id)
         }
     }, [location.state])
@@ -47,9 +47,7 @@ function FolderViewer() {
         loadFolderContents()
     }, [folderId])
 
-    function loadNewFolder(e) {
-        setFolderId(e.target.id)
-    }
+    function loadNewFolder(e) { setFolderId(e.target.id) }
 
     function loadFile(e) { navigate('/file', { state: { id: e.target.id } }) }
 
@@ -70,7 +68,7 @@ function FolderViewer() {
                 {parentFolderId !== undefined && parentFolderId !== null
                     && <ParentFolderButton parentId={parentFolderId} />}
                 <div className='currentFolder'>
-                    <FaFolderOpen /> {folderName}
+                    <FaFolderOpen /> {folderName === "root" ? "/" : folderName}
                 </div>
 
                 {subFolders.length > 0 &&

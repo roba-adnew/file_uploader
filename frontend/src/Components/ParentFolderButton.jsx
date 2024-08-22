@@ -22,7 +22,7 @@ function ParentFolderButton({ parentId }) {
 
     return (
         <div id='parentFolder' onClick={loadParentFolder}>
-            <LuFolderOutput /> {name}
+            <LuFolderOutput /> {name === "root" ? "/" : name}
         </div>
     )
 }
