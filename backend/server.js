@@ -31,7 +31,7 @@ app.use(cors({
 }))
 app.use(session({
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week in ms
+    maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day in ms
     sameSite: "lax",
     secure: false
   },
