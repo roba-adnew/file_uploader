@@ -107,7 +107,7 @@ function FolderViewer() {
                                         {folder.name}
                                     </span> 
                                     <span className='folderField'>
-                                        -
+                                        &nbsp;&nbsp;&nbsp;-
                                     </span> 
                                     <span className='folderField'>
                                         {sizeDisplay(folder.sizeKB)}
@@ -129,6 +129,11 @@ function FolderViewer() {
                         })}
                     </>
                 }
+                <AddFolderForm 
+                    className='folderRow'
+                    folderId={folderId} 
+                    refetch={setRefetch} 
+                    />
                 {
                     files.length > 0 &&
                     <>
@@ -168,7 +173,6 @@ function FolderViewer() {
                     </>
                 }
                 <UploadForm folderId={folderId} refetch={setRefetch} />
-                <AddFolderForm folderId={folderId} refetch={setRefetch} />
                 <button type="button" onClick={goToTrash}>view trash</button>
             </div >
 

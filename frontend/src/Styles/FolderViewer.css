@@ -4,14 +4,15 @@
     flex-direction: column;
     align-items: center;
     border: 1px solid black;
-    width: 50rem
+    width: 55rem
 }
 
 .labelRow {
     display: inline-grid;
-    grid-template-columns: 2% 38% 10% 10% 20% 20%;
+    grid-template-columns: 2% 38% 8% 12% 20% 20%;
     width: 100%;
-    background-color: rgb(215, 215, 215);
+    background-color: rgb(79, 79, 79);
+    color: white;
     text-align: left;
     text-indent: 0.6rem;
     padding: 0.2rem 0rem 0.2rem 0rem;
@@ -20,7 +21,7 @@
 
 .folderRow {
     display: inline-grid;
-    grid-template-columns: 2% 38% 10% 10% 20% 20%;
+    grid-template-columns: 2% 38% 8% 12% 20% 20%;
     width: 100%;
     background-color: rgb(215, 215, 215);
     text-align: left;
@@ -31,10 +32,10 @@
 
 .fileRow {
     display: inline-grid;
-    grid-template-columns: 2% 38% 10% 10% 20% 20%;
+    grid-template-columns: 2% 38% 8% 12% 20% 20%;
     width: 100%;
     text-align: left;
-    text-indent: 0.9rem;
+    text-indent: 0.6rem;
     padding: 0.2rem 0rem 0.2rem 0rem;
     border: 0.5px solid rgb(82, 82, 82);
 }
@@ -56,4 +57,52 @@
     text-align: left;
     padding: 0.2rem 0rem 0.2rem 0rem;
     border: 0.5px solid rgb(82, 82, 82);
+}
+
+.folderRowForm {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: rgb(215, 215, 215);
+    text-align: left;
+    text-indent: 0.6rem;
+    padding: 0.2rem 0rem 0.2rem 0rem;
+    border: 0.5px solid rgb(82, 82, 82);
+}
+
+#addFolderToggle {
+    border: none;
+    background-color: rgb(215, 215, 215);
+    font-style: italic;
+    font-size: 1rem;
+}
+
+.newFolderForm {
+    display: inline-grid;
+    grid-template-columns: 40% 20% 20%;
+    width: 30rem;
+}
+
+.newFolderForm input {
+    background-color: rgb(169, 169, 169);
+    border: 1px solid black;
+}
+
+.newFolderForm > button {
+    background-color: rgb(215, 215, 215);
+    border: 1px solid black;
+}
+
+.fileRowForm {
+    display: flex;
+    justify-content: center;
+    width: 30rem;
+    text-align: left;
+    text-indent: 0.6rem;
+    padding: 0.2rem 0rem 0.2rem 0rem;
+}
+#addFileToggle {
+    border: none;
+    background-color: white;
+    font-size: 1rem;
 }

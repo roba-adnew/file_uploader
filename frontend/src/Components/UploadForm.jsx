@@ -40,14 +40,14 @@ function UploadForm({ folderId = null, refetch }) {
     console.log('Render state:', { file, uploading, error });
 
     return (
-            <div>
+            <div className="fileRowForm">
                 <form
                     action="/stats"
                     onSubmit={uploadFile}
                     encType="multipart/form-data"
                     method="post"
                 >
-                    <div className="form-group">
+                    <div >
                         {addingFile &&
                             <>
                                 <input
@@ -74,8 +74,8 @@ function UploadForm({ folderId = null, refetch }) {
                             <>
                                 <input
                                     type="button"
-                                    value="add a file"
-                                    id="addFileButton"
+                                    value="+ add a new file"
+                                    id="addFileToggle"
                                     onClick={toggleAddingFile}
                                 />
                             </>

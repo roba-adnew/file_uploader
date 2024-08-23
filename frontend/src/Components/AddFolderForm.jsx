@@ -42,44 +42,40 @@ function AddFolderForm({ folderId, refetch }) {
 
     return (
         isAuthorized ?
-            <div>
+            <div className="folderRowForm">
                 <form
                     onSubmit={addFolder}
                     method="post"
                 >
-                    <div className="form-group">
                         {addingFolder &&
-                            <>
+                            <div>
                                 <input
                                     type="text"
-                                    className="form-control-file"
                                     name="uploaded_file"
+                                    autoFocus
                                     onChange={updateNewFolderName}
                                 />
-                                <input
+                                <button
                                     type="button"
-                                    value="submit folder"
                                     className="toggle btn"
                                     onClick={addFolder}
-                                />
-                                <input
+                                >submit
+                                    </button>
+                                <button
                                     type="button"
-                                    value="cancel"
                                     className="cancelNewFolderButton"
                                     onClick={toggleAddingFolder}
-                                />
-                            </>
+                                >cancel</button>
+                            </div>
                         }
                         {!addingFolder &&
                             <input
                                 type="button"
-                                value="add folder"
-                                className="toggle btn"
+                                value="+ add a new folder"
+                                id="addFolderToggle"
                                 onClick={toggleAddingFolder}
                             />
                         }
-
-                    </div>
                 </form>
             </div>
             : <div>please login to add folder</div>
