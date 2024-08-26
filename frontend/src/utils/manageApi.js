@@ -80,10 +80,15 @@ async function deleteFile(fileId) {
 
 async function moveFile(fileId, newParentFolderId) {
     const url = `${base_url}/location`;
+    const body = {
+        fileId: fileId, 
+        newParentFolderId: newParentFolderId
+    }
     const options = {
         method: 'PUT', 
         credentials: 'include',
-        body: JSON.stringify({fileId, newParentFolderId})
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(body)
     }
     try {
         const response = await fetch(url, options)

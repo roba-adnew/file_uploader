@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { AuthContext } from '../Contexts/AuthContext';
 import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
+import { moveFile } from '../utils/manageApi';
 import { sizeDisplay, typeDisplay } from '../utils/functions'
 import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
@@ -70,6 +71,31 @@ function FolderViewer() {
         navigate('/trash', { state: { lastFolderId: folderId } })
     }
 
+    function allowDrop(e) { e.preventDefault() }
+
+    function grabFileId(e) { e.dataTransfer.setData('file', e.target.id) }
+
+    async function updateParentFolder(e) {
+        e.preventDefault();
+        const child = e.target.closest('.folderField');
+        const newParentFolder = child ? child.parentElement.id : e.target.id;
+        console.log('new parent', newParentFolder)
+        console.log('data transfer', e.dataTransfer.types[0])
+        if (e.dataTransfer.types[0] === 'file') {
+            const fileId = e.dataTransfer.getData('file')
+            try {
+                const response = await moveFile(fileId, newParentFolder)
+                const results = response.json()
+                console.log('file move results', results)
+            } catch (err) {
+                console.error(err)
+                throw err
+            } finally {
+                setRefetch(true)
+            }
+        }
+    }
+
     if (!files || !subFolders) return <div>issue loading</div>
 
     console.log('Render state:', {
@@ -106,6 +132,8 @@ function FolderViewer() {
                                     id={folder.id}
                                     className="folderRow"
                                     onClick={loadNewFolder}
+                                    onDragOver={allowDrop}
+                                    onDrop={updateParentFolder}
                                 >
                                     <CiFolderOn />
                                     <span className='folderField'>
@@ -150,6 +178,7 @@ function FolderViewer() {
                                     draggable="true"
                                     className="fileRow"
                                     onClick={loadFile}
+                                    onDragStart={grabFileId}
                                 >
                                     <CiFileOn />
                                     <span className='fileField'>

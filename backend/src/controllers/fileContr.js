@@ -265,7 +265,6 @@ exports.updateFileLocationPut = [
             debug('old lineage:', oldLineage)
             debug('new lineage:', newLineage)
 
-
             const readOldLineagePromises = oldLineage.map(
                 async (folderId) => {
                     const result = await prisma.folder.findFirst({
