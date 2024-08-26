@@ -59,7 +59,12 @@ function FolderViewer() {
         setFolderId(e.target.id)
     }
 
-    function loadFile(e) { navigate('/file', { state: { id: e.target.id } }) }
+    function loadFile(e) {
+        const clickedField = e.target.closest('.fileField');
+        const fileId = 
+            clickedField ? clickedField.parentElement.id : e.target.id;
+        navigate('/file', { state: { id: fileId } }) 
+    }
 
     function goToTrash() {
         navigate('/trash', { state: { lastFolderId: folderId } })
@@ -115,13 +120,13 @@ function FolderViewer() {
                                     <span className='folderField'>
                                         {format(
                                             folder.createdAt,
-                                            'M-dd-YYY, h:mm aaa'
+                                            'M-dd-yyy, h:mm aaa'
                                         )}
                                     </span>
                                     <span className='folderField'>
                                         {format(
                                             folder.updatedAt,
-                                            'M-dd-YYY, h:mm aaa'
+                                            'M-dd-yyy, h:mm aaa'
                                         )}
                                     </span>
                                 </div>
@@ -142,6 +147,7 @@ function FolderViewer() {
                                 <div
                                     key={file.id}
                                     id={file.id}
+                                    draggable="true"
                                     className="fileRow"
                                     onClick={loadFile}
                                 >
@@ -158,13 +164,13 @@ function FolderViewer() {
                                     <span className='fileField'>
                                         {format(
                                             file.createdAt,
-                                            'M-dd-YYY, h:mm aaa'
+                                            'M-dd-yyy, h:mm aaa'
                                         )}
                                     </span>
                                     <span className='fileField'>
                                         {format(
                                             file.updatedAt,
-                                            'M-dd-YYY, h:mm aaa'
+                                            'M-dd-yyy, h:mm aaa'
                                         )}
                                     </span>
                                 </div>
