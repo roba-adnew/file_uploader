@@ -61,11 +61,21 @@ function FileViewer() {
                     </tr>
                     <tr>
                         <td>created at</td>
-                        <td>{format(file.details.createdAt, 'M-dd-YYY, h:mm aaa')}</td>
+                        <td>{
+                            format(
+                                file.details.createdAt,
+                                'M-dd-yyy, h:mm aaa'
+                            )}
+                        </td>
                     </tr>
                     <tr>
                         <td>last updated at</td>
-                        <td>{format(file.details.updatedAt, 'M-dd-YYY, h:mm aaa')}</td>
+                        <td>{
+                            format(
+                                file.details.updatedAt,
+                                'M-dd-yyy, h:mm aaa'
+                            )}
+                        </td>
                     </tr>
                     <tr>
                         <td>downloads</td>

@@ -259,8 +259,12 @@ exports.updateFileLocationPut = [
         const { fileId, newParentFolderId } = req.body
         try {
             const file = await prisma.file.findFirst({ where: { id: fileId } })
-            const oldLineage = await getFolderIdLineage(file)
+            const oldParentFolderId = file.parentFolderId;
+            const oldLineage = await getFolderIdLineage(oldParentFolderId)
             const newLineage = await getFolderIdLineage(newParentFolderId)
+            debug('old lineage:', oldLineage)
+            debug('new lineage:', newLineage)
+
 
             const readOldLineagePromises = oldLineage.map(
                 async (folderId) => {
@@ -270,6 +274,7 @@ exports.updateFileLocationPut = [
                     return result;
                 }
             )
+
             const readOldLineageResults =
                 await Promise.all(readOldLineagePromises)
 
