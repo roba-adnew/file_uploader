@@ -78,4 +78,25 @@ async function deleteFile(fileId) {
     }
 }
 
-export { uploadFile, getFileDetails, deleteFile }
+async function moveFile(fileId, newParentFolderId) {
+    const url = `${base_url}/location`;
+    const options = {
+        method: 'PUT', 
+        credentials: 'include',
+        body: JSON.stringify({fileId, newParentFolderId})
+    }
+    try {
+        const response = await fetch(url, options)
+        console.log('upload response', response)
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Upload failed');
+        }
+        return response.json()
+    } catch (err) {
+        console.error('upload error:', err)
+        throw err
+    }
+}
+
+export { uploadFile, getFileDetails, deleteFile, moveFile }

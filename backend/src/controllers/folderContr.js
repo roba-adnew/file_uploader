@@ -151,8 +151,9 @@ exports.updateFolderLocationPut = [
             const folder = await prisma.folder.findFirst(
                 { where: { id: folderId } }
             )
+            const oldParentFolderId = folder.parentFolderId;
             const oldLineage =
-                await exports.getFolderIdLineage(folder.parentFolderId)
+                await exports.getFolderIdLineage(oldParentFolderId)
             const newLineage =
                 await exports.getFolderIdLineage(newParentFolderId)
 
