@@ -95,7 +95,7 @@ async function moveFile(fileId, newParentFolderId) {
         console.log('upload response', response)
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Upload failed');
+            throw new Error(errorData.message || 'file change failed');
         }
         return response.json()
     } catch (err) {

@@ -74,4 +74,30 @@ async function addFolder(parentFolderId, folderName) {
     }
 }
 
-export { getFolderContents, addFolder, getTrashContents }
+async function moveFolder(folderId, newParentFolderId) {
+    const url = `${base_url}/location`;
+    const body = {
+        folderId: folderId, 
+        newParentFolderId: newParentFolderId
+    }
+    const options = {
+        method: 'PUT', 
+        credentials: 'include',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(body)
+    }
+    try {
+        const response = await fetch(url, options)
+        console.log('upload response', response)
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'folder change failed');
+        }
+        return response.json()
+    } catch (err) {
+        console.error('upload error:', err)
+        throw err
+    }
+}
+
+export { getFolderContents, addFolder, getTrashContents, moveFolder }

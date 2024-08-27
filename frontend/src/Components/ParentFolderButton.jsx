@@ -21,7 +21,7 @@ function ParentFolderButton({ parentId }) {
     function loadParentFolder() { navigate('/', { state: { id: parentId } }) }
 
     return (
-        <div id='parentFolder' onClick={loadParentFolder}>
+        <div className='parentFolder' onClick={loadParentFolder}>
             <LuFolderOutput /> {name === "root" ? "/" : name}
         </div>
     )

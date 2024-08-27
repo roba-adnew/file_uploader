@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns'
 import { AuthContext } from '../Contexts/AuthContext';
 import { getFileDetails as apiGetFile, deleteFile as apiDeleteFile }
-    from '../utils/manageApi';
+    from '../utils/fileApi';
 import { sizeDisplay, typeDisplay } from '../utils/functions';
 import ParentFolderButton from './ParentFolderButton';
 

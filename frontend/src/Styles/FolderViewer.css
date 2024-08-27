@@ -40,7 +40,7 @@
     border: 0.5px solid rgb(82, 82, 82);
 }
 
-#parentFolder {
+.parentFolder {
     width: 100%;
     background-color: rgb(85, 85, 85);
     color: white;
@@ -51,6 +51,8 @@
 }
 
 .currentFolder {
+    display: inline-grid;
+    grid-template-columns: 2% 47% 28% 10%;
     width: 100%;
     background-color: black;
     color: white;

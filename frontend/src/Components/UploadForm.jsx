@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { uploadFile as apiUploadFile } from '../utils/manageApi'
+import { uploadFile as apiUploadFile } from '../utils/fileApi'
 import PropTypes from 'prop-types'
 
 function UploadForm({ folderId = null, refetch }) {
