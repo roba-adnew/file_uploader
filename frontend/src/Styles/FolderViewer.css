@@ -113,4 +113,6 @@
 #trashButton {
     margin-top: 1rem;
     border-radius: 0;
+    border: 1px solid black;
+    background-color: rgb(255, 210, 210);
 }

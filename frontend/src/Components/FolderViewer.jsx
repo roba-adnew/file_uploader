@@ -126,8 +126,8 @@ function FolderViewer() {
     });
 
     return (
-        <>
-            {isAuthorized ?
+        isAuthorized ?
+            <>
                 <div id='folderViewer'>
                     {parentFolderId !== undefined && parentFolderId !== null
                         &&
@@ -246,12 +246,11 @@ function FolderViewer() {
                     <UploadForm folderId={folderId} refetch={setRefetch} />
 
                 </div >
-                : <div>please login to continue</div>
-            }
-            <button id='trashButton' type="button" onClick={goToTrash}>
-                <FaTrashAlt /> View Trash
-            </button>
-        </>
+                <button id='trashButton' type="button" onClick={goToTrash}>
+                    <FaTrashAlt /> View Trash
+                </button>
+            </>
+            : <div>please login to continue</div>
     )
 }
 
