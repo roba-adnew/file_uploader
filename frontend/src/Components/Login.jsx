@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../Contexts/AuthContext'
 
 function Login() {
-    const { authorize, isAuthorized } = useContext(AuthContext)
+    const { authorize, isAuthorized, setUsername } = useContext(AuthContext)
     const [credentials, setCredentials] = useState({
         usernameOrEmail: '',
         password: ''
@@ -25,8 +25,9 @@ function Login() {
         try {
             console.log('logging in, credentials:', credentials)
             const response = await apiLogin(credentials)
-            if (response.ok) authorize()
-            console.log('login response', response)
+            console.log('login response', response.user.username)
+            authorize();
+            setUsername(response.user.username)
             navigate('/', { state: { id: response.folderId } })
         } catch (err) {
             setError(err)
@@ -35,6 +36,7 @@ function Login() {
     }
 
     console.log('Render state:', { credentials, error });
+
     return (
         <>
             {!isAuthorized &&

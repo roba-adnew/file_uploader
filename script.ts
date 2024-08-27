@@ -74,11 +74,7 @@ async function customUpdate() {
     try {
         const results = await prisma.folder.update({
             where: { id: "f1e34044-62ca-457a-aa1b-aa9211aafb72" },
-            data: {
-                parentFolder: {
-                    connect: { id: "bfa0dec3-a822-4877-b4bb-5fcbe674e195" }
-                }
-            }
+            data: { sizeKB: 145.041 }
         })
     } catch (err) {
         console.error(err)

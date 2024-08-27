@@ -8,6 +8,7 @@ const AuthContext = createContext(null)
 
 function AuthProvider({ children }) {
     const [isAuthorized, setIsAuthorized] = useState(false)
+    const [username, setUsername] = useState(null)
     const navigate = useNavigate();
 
     function authorize() { setIsAuthorized(true) }
@@ -46,7 +47,7 @@ function AuthProvider({ children }) {
     }
 
 
-    const contextData = { isAuthorized, authorize, updateLogout }
+    const contextData = { isAuthorized, authorize, updateLogout, username, setUsername }
 
     return (
         <AuthContext.Provider value={contextData}>

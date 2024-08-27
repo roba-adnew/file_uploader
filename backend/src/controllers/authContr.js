@@ -99,7 +99,7 @@ exports.postLogin = [
                 return res
                     .status(200)
                     .json({
-                        user: req.session.user,
+                        user: req.user,
                         message: "logged in",
                         rootFolderId: rootFolder.id
                     })

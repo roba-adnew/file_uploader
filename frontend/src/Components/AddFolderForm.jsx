@@ -10,7 +10,6 @@ function AddFolderForm({ folderId, refetch }) {
     const [error, setError] = useState(null)
     const { isAuthorized } = useContext(AuthContext)
 
-
     function updateNewFolderName(e) { setNewFolderName(e.target.value) }
 
     function toggleAddingFolder() { setAddingFolder(!addingFolder) }

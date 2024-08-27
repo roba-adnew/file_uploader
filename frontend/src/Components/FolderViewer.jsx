@@ -14,6 +14,7 @@ import ParentFolderButton from './ParentFolderButton';
 import { CiFolderOn, CiFileOn } from "react-icons/ci";
 import { FaFolderOpen } from "react-icons/fa";
 import { MdLabel } from "react-icons/md";
+import { FaTrashAlt } from "react-icons/fa";
 import '../Styles/FolderViewer.css'
 
 function FolderViewer() {
@@ -125,126 +126,132 @@ function FolderViewer() {
     });
 
     return (
-        isAuthorized ?
-            <div id='folderViewer'>
-
-                <div id={parentFolderId} className='parentFolder'>
+        <>
+            {isAuthorized ?
+                <div id='folderViewer'>
                     {parentFolderId !== undefined && parentFolderId !== null
                         &&
-                        <ParentFolderButton
-                            parentId={parentFolderId}
-                            allowDrop={allowDrop}
-                            updateParentFolder={updateParentFolder}
-                        />
+                        <div id={parentFolderId} className='parentFolder'>
+                            <ParentFolderButton
+                                parentId={parentFolderId}
+                                allowDrop={allowDrop}
+                                updateParentFolder={updateParentFolder}
+                            />
+
+                        </div>
                     }
-                </div>
-                <div className='currentFolder'>
-                    <FaFolderOpen />
-                    &nbsp;{folderName === "root" ? "/" : folderName}
-                    <span>
-                        {sizeDisplay(size)}{folderName === "root" && " / 50 MB"}
-                    </span>
-                </div>
+                    <div className='currentFolder'>
+                        <FaFolderOpen />
+                        &nbsp;{folderName === "root" ? "/" : folderName}
+                        <span>
+                            {sizeDisplay(size)}
+                            {folderName === "root" && " / 5 MB"}
+                        </span>
+                    </div>
 
-                <div className='labelRow'>
-                    <MdLabel />
-                    <span>name</span>
-                    <span>type</span>
-                    <span>size</span>
-                    <span>created at</span>
-                    <span>last updated at</span>
-                </div>
-                {subFolders.length > 0 &&
-                    <>
-                        {subFolders.map((folder) => {
-                            return (
-                                <div
-                                    key={folder.id}
-                                    id={folder.id}
-                                    className="folderRow"
-                                    draggable="true"
-                                    onClick={loadNewFolder}
-                                    onDragStart={grabFolderId}
-                                    onDragOver={allowDrop}
-                                    onDrop={updateParentFolder}
-                                >
-                                    <CiFolderOn />
-                                    <span className='folderField'>
-                                        {folder.name}
-                                    </span>
-                                    <span className='folderField'>
-                                        &nbsp;&nbsp;&nbsp;-
-                                    </span>
-                                    <span className='folderField'>
-                                        {sizeDisplay(folder.sizeKB)}
-                                    </span>
-                                    <span className='folderField'>
-                                        {format(
-                                            folder.createdAt,
-                                            'M-dd-yyy, h:mm aaa'
-                                        )}
-                                    </span>
-                                    <span className='folderField'>
-                                        {format(
-                                            folder.updatedAt,
-                                            'M-dd-yyy, h:mm aaa'
-                                        )}
-                                    </span>
-                                </div>
-                            )
-                        })}
-                    </>
-                }
-                <AddFolderForm
-                    className='folderRow'
-                    folderId={folderId}
-                    refetch={setRefetch}
-                />
-                {
-                    files.length > 0 &&
-                    <>
-                        {files.map((file) => {
-                            return (
-                                <div
-                                    key={file.id}
-                                    id={file.id}
-                                    draggable="true"
-                                    className="fileRow"
-                                    onClick={loadFile}
-                                    onDragStart={grabFileId}
-                                >
-                                    <CiFileOn />
-                                    <span className='fileField'>
-                                        {file.name}
-                                    </span>
-                                    <span className='fileField'>
-                                        {typeDisplay(file.type)}
-                                    </span>
-                                    <span className='fileField'>
-                                        {sizeDisplay(file.sizeKB)}
-                                    </span>
-                                    <span className='fileField'>
-                                        {format(
-                                            file.createdAt,
-                                            'M-dd-yyy, h:mm aaa'
-                                        )}
-                                    </span>
-                                    <span className='fileField'>
-                                        {format(
-                                            file.updatedAt,
-                                            'M-dd-yyy, h:mm aaa'
-                                        )}
-                                    </span>
-                                </div>
-                            )
-                        })}
-                    </>
-                }
-                <UploadForm folderId={folderId} refetch={setRefetch} />
-                <button type="button" onClick={goToTrash}>view trash</button>
-            </div >
+                    <div className='labelRow'>
+                        <MdLabel />
+                        <span>name</span>
+                        <span>type</span>
+                        <span>size</span>
+                        <span>created at</span>
+                        <span>last updated at</span>
+                    </div>
+                    {subFolders.length > 0 &&
+                        <>
+                            {subFolders.map((folder) => {
+                                return (
+                                    <div
+                                        key={folder.id}
+                                        id={folder.id}
+                                        className="folderRow"
+                                        draggable="true"
+                                        onClick={loadNewFolder}
+                                        onDragStart={grabFolderId}
+                                        onDragOver={allowDrop}
+                                        onDrop={updateParentFolder}
+                                    >
+                                        <CiFolderOn />
+                                        <span className='folderField'>
+                                            {folder.name}
+                                        </span>
+                                        <span className='folderField'>
+                                            &nbsp;&nbsp;&nbsp;-
+                                        </span>
+                                        <span className='folderField'>
+                                            {sizeDisplay(folder.sizeKB)}
+                                        </span>
+                                        <span className='folderField'>
+                                            {format(
+                                                folder.createdAt,
+                                                'M-dd-yyy, h:mm aaa'
+                                            )}
+                                        </span>
+                                        <span className='folderField'>
+                                            {format(
+                                                folder.updatedAt,
+                                                'M-dd-yyy, h:mm aaa'
+                                            )}
+                                        </span>
+                                    </div>
+                                )
+                            })}
+                        </>
+                    }
+                    <AddFolderForm
+                        className='folderRow'
+                        folderId={folderId}
+                        refetch={setRefetch}
+                    />
+                    {
+                        files.length > 0 &&
+                        <>
+                            {files.map((file) => {
+                                return (
+                                    <div
+                                        key={file.id}
+                                        id={file.id}
+                                        draggable="true"
+                                        className="fileRow"
+                                        onClick={loadFile}
+                                        onDragStart={grabFileId}
+                                    >
+                                        <CiFileOn />
+                                        <span className='fileField'>
+                                            {file.name}
+                                        </span>
+                                        <span className='fileField'>
+                                            {typeDisplay(file.type)}
+                                        </span>
+                                        <span className='fileField'>
+                                            {sizeDisplay(file.sizeKB)}
+                                        </span>
+                                        <span className='fileField'>
+                                            {format(
+                                                file.createdAt,
+                                                'M-dd-yyy, h:mm aaa'
+                                            )}
+                                        </span>
+                                        <span className='fileField'>
+                                            {format(
+                                                file.updatedAt,
+                                                'M-dd-yyy, h:mm aaa'
+                                            )}
+                                        </span>
+                                    </div>
+                                )
+                            })}
+                        </>
+                    }
+                    <UploadForm folderId={folderId} refetch={setRefetch} />
 
-            : <div>please login to continue</div>
+                </div >
+                : <div>please login to continue</div>
+            }
+            <button id='trashButton' type="button" onClick={goToTrash}>
+                <FaTrashAlt /> View Trash
+            </button>
+        </>
     )
 }
 

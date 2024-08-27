@@ -108,3 +108,9 @@
     background-color: white;
     font-size: 1rem;
 }
+
+
+#trashButton {
+    margin-top: 1rem;
+    border-radius: 0;
+}
