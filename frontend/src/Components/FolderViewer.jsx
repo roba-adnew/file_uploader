@@ -121,7 +121,11 @@ function FolderViewer() {
                 {parentFolderId !== undefined && parentFolderId !== null
                     && <ParentFolderButton parentId={parentFolderId} />}
                 <div className='currentFolder'>
-                    <FaFolderOpen /> {folderName === "root" ? "/" : folderName}
+                    <FaFolderOpen />
+                    &nbsp;{folderName === "root" ? "/" : folderName}
+                    <span>
+                        {sizeDisplay(size)}{folderName === "root" && " / 50 MB"}
+                    </span>
                 </div>
                 <div className='labelRow'>
                     <MdLabel />
