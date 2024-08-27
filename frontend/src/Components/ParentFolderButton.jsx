@@ -5,7 +5,7 @@ import { LuFolderOutput } from "react-icons/lu";
 import { getFolderContents as apiGetFolderContents } from '../utils/folderApi';
 import '../Styles/FolderViewer.css'
 
-function ParentFolderButton({ parentId }) {
+function ParentFolderButton({ parentId, allowDrop, updateParentFolder }) {
     const [name, setName] = useState(null)
     const navigate = useNavigate()
 
@@ -21,12 +21,23 @@ function ParentFolderButton({ parentId }) {
     function loadParentFolder() { navigate('/', { state: { id: parentId } }) }
 
     return (
-        <div className='parentFolder' onClick={loadParentFolder}>
-            <LuFolderOutput /> {name === "root" ? "/" : name}
+        <div 
+            className='folderField' 
+            id={parentId}
+            onClick={loadParentFolder}
+            onDragOver={allowDrop}
+            onDrop={updateParentFolder}
+            >
+            <LuFolderOutput className='folderField'/>
+            &nbsp;&nbsp;{name === "root" ? "/" : name}
         </div>
     )
 }
 
-ParentFolderButton.propTypes = { parentId: PropTypes.string }
+ParentFolderButton.propTypes = { 
+    parentId: PropTypes.string,
+    allowDrop: PropTypes.func,
+    updateParentFolder: PropTypes.func,
+ }
 
 export default ParentFolderButton;

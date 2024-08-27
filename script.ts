@@ -70,7 +70,22 @@ async function clearFilesAndFolders() {
     }
 }
 
-async function updates() {
+async function customUpdate() {
+    try {
+        const results = await prisma.folder.update({
+            where: { id: "f1e34044-62ca-457a-aa1b-aa9211aafb72" },
+            data: {
+                parentFolder: {
+                    connect: { id: "bfa0dec3-a822-4877-b4bb-5fcbe674e195" }
+                }
+            }
+        })
+    } catch (err) {
+        console.error(err)
+    }
+}
+
+async function resetToZero() {
     try {
         const user = await prisma.user.updateMany({
             data: { memoryUsedKB: 0 }
@@ -112,7 +127,7 @@ async function findEverything() {
             .storage
             .from('files')
             .list()
-        
+
         if (listError) console.error('supabase listing error', listError)
 
         const fileList: string[] = listData
@@ -137,9 +152,9 @@ async function testing() {
     try {
         const diff = 1000;
         let trashFiles = await prisma.file.findMany({
-            where: { 
+            where: {
                 parentFolderId: "60e5d65c-7c67-4a85-87a4-5d568c9975ce", // replace with trashFolder.id
-                deleted: true 
+                deleted: true
             },
             orderBy: { deletedAt: 'asc' }
         })
@@ -150,7 +165,7 @@ async function testing() {
 
         if (true) {
             for (let file of trashFiles) {
-                deletedKB =+ file.sizeKB
+                deletedKB = + file.sizeKB
                 deletedFiles.push(trashFiles.shift())
                 if (deletedKB >= diff) break
             }

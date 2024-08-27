@@ -89,11 +89,20 @@ function FolderViewer() {
         const type = e.dataTransfer.types[0];
         const apiMoveFunc = moveFunction[type]
         const child = e.target.closest(`.${type}Field`);
-        const newParentFolder = child ? child.parentElement.id : e.target.id;
+        const newParentFolderId = child ? child.parentElement.id : e.target.id;
         const fileOrFolderId = e.dataTransfer.getData(type)
 
+        console.log('type:', type)
+        console.log('child:', child)
+        console.log('child parent id:', child.parentElement.id)
+        console.log('parent ID:', newParentFolderId)
+
+
+        if (fileOrFolderId === newParentFolderId) return;
+
         try {
-            const response = await apiMoveFunc(fileOrFolderId, newParentFolder)
+            const response =
+                await apiMoveFunc(fileOrFolderId, newParentFolderId)
             const results = response.json()
             console.log('move results', results)
         } catch (err) {
@@ -118,8 +127,17 @@ function FolderViewer() {
     return (
         isAuthorized ?
             <div id='folderViewer'>
-                {parentFolderId !== undefined && parentFolderId !== null
-                    && <ParentFolderButton parentId={parentFolderId} />}
+
+                <div id={parentFolderId} className='parentFolder'>
+                    {parentFolderId !== undefined && parentFolderId !== null
+                        &&
+                        <ParentFolderButton
+                            parentId={parentFolderId}
+                            allowDrop={allowDrop}
+                            updateParentFolder={updateParentFolder}
+                        />
+                    }
+                </div>
                 <div className='currentFolder'>
                     <FaFolderOpen />
                     &nbsp;{folderName === "root" ? "/" : folderName}
@@ -127,6 +145,7 @@ function FolderViewer() {
                         {sizeDisplay(size)}{folderName === "root" && " / 50 MB"}
                     </span>
                 </div>
+
                 <div className='labelRow'>
                     <MdLabel />
                     <span>name</span>
