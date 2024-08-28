@@ -1,6 +1,6 @@
 function sizeDisplay(sizeKB) {
-    if (sizeKB < 1000) return `${Math.round(sizeKB)} KB`
-    if (sizeKB > 1000) return `${Math.round(sizeKB/1000)} MB`
+    if (sizeKB < 1000) return `${Math.round(sizeKB*10)/10} KB`
+    if (sizeKB > 1000) return `${Math.round(sizeKB/1000*10)/10} MB`
 }
 
 function typeDisplay(fileType) {
