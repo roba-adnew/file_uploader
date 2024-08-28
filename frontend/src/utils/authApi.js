@@ -57,8 +57,9 @@ async function checkAuth() {
 
     try {
         const response = await fetch(url, options)
+        const results = await response.json()
         console.log('check auth response', response)
-        return response.ok
+        return results;
     } catch (err) {
         console.error(err)
         throw err

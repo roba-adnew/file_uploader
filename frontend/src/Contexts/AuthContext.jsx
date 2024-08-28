@@ -24,7 +24,11 @@ function AuthProvider({ children }) {
     async function checkAuthorization() {
         try {
             const authorization = await apiCheckAuth()
-            if (authorization) authorize()
+            console.log('auth:', authorization)
+            if (authorization) {
+                authorize();
+                setUsername(authorization.user.username)
+            }
             if (!authorization) unAuthorize()
         } catch (err) {
             console.error(err)
