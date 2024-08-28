@@ -20,7 +20,7 @@ exports.postFileUpload = [
         debug('file details: %O', req.file)
         debug('parentFolder', req.body.parentFolderId)
         const { originalname, buffer, mimetype, size } = req.file;
-        let parentFolderId = req.body.parentFolderId === undefined 
+        let parentFolderId = req.body.parentFolderId === undefined
             ? null
             : req.body.parentFolderId;
 
@@ -337,16 +337,15 @@ exports.deleteFile = [
     postAuthCheck,
     async (req, res, next) => {
         const { fileId } = req.body;
-        debug('commencing file deletion')
+        debug('commencing moving file to trash')
 
         try {
             const fileToDelete = await prisma.file.findFirst({
                 where: { id: fileId },
-                include: { parentFolder: true}
+                include: { parentFolder: true }
             })
             const trashFolder = await prisma.folder.findFirst({
                 where: { userId: req.user.id, isTrash: true }
-
             })
 
             const folderLineage = await getFolderIdLineage(fileToDelete.parentFolderId)
@@ -373,6 +372,7 @@ exports.deleteFile = [
                     }
                 }
             })
+
             const addTrashMemory = await prisma.folder.update({
                 where: { id: trashFolder.id },
                 data: { sizeKB: { increment: deletedFile.sizeKB } }
@@ -436,5 +436,46 @@ exports.deleteFile = [
             debug('error deleting file: %O', err)
             throw err
         }
+    }
+]
+
+exports.permanentlyDeleteFile = [
+    postAuthCheck,
+    async (req, res, next) => {
+        const { fileId } = req.body;
+        debug('commencing moving file to trash')
+
+        const fileToDelete = await prisma.file.findFirst({
+            where: { id: fileId },
+            include: { parentFolder: true }
+        })
+        const trashFolder = await prisma.folder.findFirst({
+            where: { userId: req.user.id, isTrash: true }
+        })
+        const dbDeletion = await prisma.file.delete({
+            where: { id: fileToDelete.id }
+        })
+        const updateTrashFolder = await prisma.folder.update({
+            where: { id: trashFolder.id },
+            data: { sizeKB: { decrement: fileToDelete.sizeKB } }
+        })
+
+        const { data, error } = await supabase
+            .storage
+            .from('files')
+            .remove([fileToDelete.name])
+
+        if (error) {
+            debug('error deleting file', error)
+            res.status(500).json({ message: 'error deleting file' })
+        }
+
+        debug('prisma file deletion', dbDeletion)
+        debug('trash folder removal', updateTrashFolder)
+        debug('supabase deletion', data)
+
+        return res
+            .status(201)
+            .json({ message: `${fileToDelete.name} has been deleted` })
     }
 ]

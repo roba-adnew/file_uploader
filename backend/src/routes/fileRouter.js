@@ -15,4 +15,6 @@ router.put('/location', fileContr.updateFileLocationPut)
 
 router.delete('/', fileContr.deleteFile)
 
+router.delete('/delete', fileContr.permanentlyDeleteFile)
+
 module.exports = router

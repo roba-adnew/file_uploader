@@ -1,9 +1,13 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
+import { format } from 'date-fns';
 import { AuthContext } from '../Contexts/AuthContext';
-import { getTrashContents as apiGetTrashContents } from '../utils/folderApi';
 import { CiFileOn } from "react-icons/ci";
 import { FaTrashAlt } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
+import { typeDisplay, sizeDisplay } from '../utils/functions';
+import { getTrashContents as apiGetTrashContents } from '../utils/folderApi';
+
 import '../Styles/FolderViewer.css'
 
 function TrashFolderViewer() {
@@ -54,14 +58,45 @@ function TrashFolderViewer() {
                                     id={file.id}
                                     className="trashFileRow"
                                 >
-                                    <CiFileOn />  {file.name}
+                                    <CiFileOn />
+                                    <span className='trashFileField'>
+                                        {file.name}
+                                    </span>
+                                    <span className='trashFileField'>
+                                        {typeDisplay(file.type)}
+                                    </span>
+                                    <span className='trashFileField'>
+                                        {sizeDisplay(file.sizeKB)}
+                                    </span>
+                                    <span className='trashFileField'>
+                                        {format(
+                                            file.createdAt,
+                                            'M-dd-yyy, h:mm aaa'
+                                        )}
+                                    </span>
+                                    <span className='trashFileField'>
+                                        {format(
+                                            file.updatedAt,
+                                            'M-dd-yyy, h:mm aaa'
+                                        )}
+                                    </span>
+                                    <button
+                                        className='permDelete'
+                                        type="button"
+                                        onClick={goBack}
+                                    >
+                                        <MdDeleteForever />
+                                    </button>
+
                                 </div>
                             })}
                         </>
                         : <div>No trash yet</div>
                     }
                 </div>
-                <button type="button" onClick={goBack}>go back</button>
+                <button id='backButton' type="button" onClick={goBack}>
+                    go back
+                </button>
             </>
             : <div>please login to continue</div>
     )
