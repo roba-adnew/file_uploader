@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { AuthContext } from '../Contexts/AuthContext';
@@ -7,18 +7,20 @@ import { FaTrashAlt } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { typeDisplay, sizeDisplay } from '../utils/functions';
 import { getTrashContents as apiGetTrashContents } from '../utils/folderApi';
-import { permanentlyDeleteFile as apiPermDelete} from '../utils/fileApi'
+import { permanentlyDeleteFile as apiPermDelete } from '../utils/fileApi'
 
 import '../Styles/FolderViewer.css'
 
 function TrashFolderViewer() {
     const [contents, setContents] = useState(null)
+    const [fileToDelete, setFileToDelete] = useState(null)
     const [error, setError] = useState(null)
     const [refetch, setRefetch] = useState(false)
+    const [midDeletion, setMidDeletion] = useState(false)
     const { isAuthorized } = useContext(AuthContext)
     const navigate = useNavigate()
     const location = useLocation()
-
+    const dialogRef = useRef(null);
 
     useEffect(() => {
         async function loadTrashFolderContents() {
@@ -42,19 +44,31 @@ function TrashFolderViewer() {
         navigate('/', { state: { id: location.state.lastFolderId } })
     }
 
-    async function handlePermDeletion(e) {
-        const parentRow = e.target.closest('.trashFileRow');
-        const fileId = parentRow.id;
-        console.log('parent', parentRow)
-        console.log('id:', fileId)
+    async function handlePermDeletion() {
+        console.log('id:', fileToDelete)
         try {
-            const deletion = await apiPermDelete(fileId)
+            const deletion = await apiPermDelete(fileToDelete)
             console.log(deletion)
-            setRefetch(true);
+            resetModal()
+            setRefetch(true)
         } catch (err) {
             console.error(err)
             throw err
-        }    
+        }
+    }
+
+    function resetModal() {
+        if (!dialogRef.current) { return }
+        setMidDeletion(false)
+        dialogRef.current.close();
+    }
+
+    async function presentDeletionModal(e) {
+        const parentRow = e.target.closest('.trashFileRow');
+        const fileId = parentRow.id;
+        setFileToDelete(fileId);
+        setMidDeletion(true);
+        dialogRef.current.close();
     }
 
     console.log('Render state:', {
@@ -65,6 +79,20 @@ function TrashFolderViewer() {
     return (
         isAuthorized && contents ?
             <>
+                <dialog ref={dialogRef}>
+                    <div>
+                        Are you sure you want to delete this file?
+                        If you do, it will no longer exist in our systems and
+                        we will not be able to recover it.
+                    </div>
+                    <button onClick={resetModal}>
+                        Nevermind
+                    </button>
+                    <button onClick={handlePermDeletion}>
+                        Yes, permanently delete
+                    </button>
+                </dialog>
+                {midDeletion && dialogRef.current.showModal()}
                 <div id='trashFolderViewer'>
                     <div className='currentFolder'>
                         <FaTrashAlt /> Trash
@@ -102,7 +130,7 @@ function TrashFolderViewer() {
                                     <button
                                         className='permDelete'
                                         type="button"
-                                        onClick={handlePermDeletion}
+                                        onClick={presentDeletionModal}
                                     >
                                         <MdDeleteForever />
                                     </button>

@@ -56,7 +56,7 @@ exports.postFileUpload = [
                 }
             })
 
-            const folderLineage = await getFolderIdLineage(newFile)
+            const folderLineage = await getFolderIdLineage(parentFolderId)
 
             const addMemoryFolderPromises = folderLineage.map(
                 async (folderId) => {

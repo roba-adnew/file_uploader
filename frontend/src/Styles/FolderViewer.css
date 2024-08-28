@@ -106,6 +106,7 @@
 #addFileToggle {
     border: none;
     background-color: white;
+    font-style: italic;
     font-size: 1rem;
 }
 
