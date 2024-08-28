@@ -78,25 +78,33 @@ function FolderViewer() {
         navigate('/trash', { state: { lastFolderId: folderId } })
     }
 
-    function allowDrop(e) { e.preventDefault() }
+    function allowDrop(e) { 
+        e.preventDefault(); 
+        e.stopPropagation(); 
+    }
 
-    function grabFileId(e) { e.dataTransfer.setData('file', e.target.id) }
+    function grabFileId(e) { 
+        e.stopPropagation();
+        e.dataTransfer.setData('file', e.target.id) 
+    }
 
-    function grabFolderId(e) { e.dataTransfer.setData('folder', e.target.id) }
+    function grabFolderId(e) { 
+        e.stopPropagation();
+        e.dataTransfer.setData('folder', e.target.id) 
+    }
 
     async function updateParentFolder(e) {
         e.preventDefault();
+        e.stopPropagation();
         const moveFunction = { file: apiMoveFile, folder: apiMoveFolder }
         const type = e.dataTransfer.types[0];
         const apiMoveFunc = moveFunction[type]
-        const child = e.target.closest(`.${type}Field`);
-        const newParentFolderId = child ? child.parentElement.id : e.target.id;
+        const newParentFolderId = e.currentTarget.id;
         const fileOrFolderId = e.dataTransfer.getData(type)
 
-        console.log('type:', type)
-        console.log('child:', child)
-        console.log('child parent id:', child.parentElement.id)
+        console.log('type', type)
         console.log('parent ID:', newParentFolderId)
+        console.log('func', moveFunction[type])
 
 
         if (fileOrFolderId === newParentFolderId) return;
