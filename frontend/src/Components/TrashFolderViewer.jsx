@@ -5,6 +5,7 @@ import { AuthContext } from '../Contexts/AuthContext';
 import { CiFileOn } from "react-icons/ci";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
+import { MdLabel } from "react-icons/md";
 import { typeDisplay, sizeDisplay } from '../utils/functions';
 import { getTrashContents as apiGetTrashContents } from '../utils/folderApi';
 import { permanentlyDeleteFile as apiPermDelete } from '../utils/fileApi'
@@ -95,6 +96,15 @@ function TrashFolderViewer() {
                 <div id='trashFolderViewer'>
                     <div className='currentFolder'>
                         <FaTrashAlt /> Trash
+                    </div>
+                    <div className='trashLabelRow'>
+                        <MdLabel />
+                        <span>name</span>
+                        <span>type</span>
+                        <span>size</span>
+                        <span>created at</span>
+                        <span>last updated at</span>
+                        <span style={{color: "red"}}>DELETE</span>
                     </div>
                     {contents.files.length > 0
                         ? <>

@@ -103,6 +103,7 @@
     text-indent: 0.6rem;
     padding: 0.2rem 0rem 0.2rem 0rem;
 }
+
 #addFileToggle {
     border: none;
     background-color: white;
@@ -110,7 +111,7 @@
     font-size: 1rem;
 }
 
-
+/* Trash folder styling */
 #trashButton {
     margin-top: 1rem;
     border-radius: 0;
@@ -148,4 +149,16 @@
     border: 1px solid black;
     width: 2rem;
     background-color: rgb(255, 90, 90);
+}
+
+.trashLabelRow {
+    display: inline-grid;
+    grid-template-columns: 2% 32% 8% 12% 20% 17% 6%;
+    width: 100%;
+    background-color: rgb(79, 79, 79);
+    color: white;
+    text-align: left;
+    text-indent: 0.6rem;
+    padding: 0.2rem 0rem 0.2rem 0rem;
+    border: 0.5px solid rgb(82, 82, 82);
 }
