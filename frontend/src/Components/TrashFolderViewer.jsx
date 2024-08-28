@@ -7,12 +7,14 @@ import { FaTrashAlt } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { typeDisplay, sizeDisplay } from '../utils/functions';
 import { getTrashContents as apiGetTrashContents } from '../utils/folderApi';
+import { permanentlyDeleteFile as apiPermDelete} from '../utils/fileApi'
 
 import '../Styles/FolderViewer.css'
 
 function TrashFolderViewer() {
     const [contents, setContents] = useState(null)
     const [error, setError] = useState(null)
+    const [refetch, setRefetch] = useState(false)
     const { isAuthorized } = useContext(AuthContext)
     const navigate = useNavigate()
     const location = useLocation()
@@ -29,13 +31,30 @@ function TrashFolderViewer() {
             } catch (err) {
                 setError(err)
                 console.error(err)
+            } finally {
+                setRefetch(false)
             }
         }
         loadTrashFolderContents()
-    }, [])
+    }, [refetch])
 
     function goBack() {
         navigate('/', { state: { id: location.state.lastFolderId } })
+    }
+
+    async function handlePermDeletion(e) {
+        const parentRow = e.target.closest('.trashFileRow');
+        const fileId = parentRow.id;
+        console.log('parent', parentRow)
+        console.log('id:', fileId)
+        try {
+            const deletion = await apiPermDelete(fileId)
+            console.log(deletion)
+            setRefetch(true);
+        } catch (err) {
+            console.error(err)
+            throw err
+        }    
     }
 
     console.log('Render state:', {
@@ -83,7 +102,7 @@ function TrashFolderViewer() {
                                     <button
                                         className='permDelete'
                                         type="button"
-                                        onClick={goBack}
+                                        onClick={handlePermDeletion}
                                     >
                                         <MdDeleteForever />
                                     </button>

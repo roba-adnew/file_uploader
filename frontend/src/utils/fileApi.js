@@ -104,4 +104,28 @@ async function moveFile(fileId, newParentFolderId) {
     }
 }
 
-export { uploadFile, getFileDetails, deleteFile, moveFile }
+async function permanentlyDeleteFile(fileId) {
+    const url = `${base_url}/delete`
+    const options = {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify({ fileId: fileId })
+    }
+    try {
+        const response = await fetch(url, options)
+        const results = await response.json()
+        return results
+    } catch (err) {
+        console.error('file deletion error:', err)
+        throw err
+    }
+}
+
+export { 
+    uploadFile, 
+    getFileDetails, 
+    deleteFile, 
+    moveFile, 
+    permanentlyDeleteFile 
+}
