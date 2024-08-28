@@ -8,7 +8,6 @@ import { MdDeleteForever } from "react-icons/md";
 import { typeDisplay, sizeDisplay } from '../utils/functions';
 import { getTrashContents as apiGetTrashContents } from '../utils/folderApi';
 import { permanentlyDeleteFile as apiPermDelete } from '../utils/fileApi'
-
 import '../Styles/FolderViewer.css'
 
 function TrashFolderViewer() {

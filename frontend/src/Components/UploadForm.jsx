@@ -15,6 +15,10 @@ function UploadForm({ folderId = null, refetch }) {
 
     async function uploadFile(e) {
         e.preventDefault();
+        if (!file) {
+            setAddingFile(false)
+            return;
+        }
         try {
             setUploading(true)
             console.log('kicking off upload from component:', file, folderId)
@@ -40,55 +44,55 @@ function UploadForm({ folderId = null, refetch }) {
     console.log('Render state:', { file, uploading, error });
 
     return (
-            <div className="fileRowForm">
-                <form
-                    action="/stats"
-                    onSubmit={uploadFile}
-                    encType="multipart/form-data"
-                    method="post"
-                >
-                    <div >
-                        {addingFile &&
-                            <>
-                                <input
-                                    type="file"
-                                    id="fileAdder"
-                                    name="uploaded_file"
-                                    ref={fileInputRef}
-                                    onChange={handleFileSelection}
-                                />
-                                <input
-                                    type="submit"
-                                    value="upload"
-                                    id="uploadButton"
-                                />
-                                <input
-                                    type="button"
-                                    value="cancel"
-                                    id="cancelUploadButton"
-                                    onClick={toggleAddingFile}
-                                />
-                            </>
-                        }
-                        {!addingFile &&
-                            <>
-                                <input
-                                    type="button"
-                                    value="+ add a new file"
-                                    id="addFileToggle"
-                                    onClick={toggleAddingFile}
-                                />
-                            </>
-                        }
-                    </div>
-                </form>
-            </div>
+        <div className="fileRowForm">
+            <form
+                action="/stats"
+                onSubmit={uploadFile}
+                encType="multipart/form-data"
+                method="post"
+            >
+                <div >
+                    {addingFile &&
+                        <>
+                            <input
+                                type="file"
+                                id="fileAdder"
+                                name="uploaded_file"
+                                ref={fileInputRef}
+                                onChange={handleFileSelection}
+                            />
+                            <input
+                                type="submit"
+                                value="upload"
+                                id="uploadButton"
+                            />
+                            <input
+                                type="button"
+                                value="cancel"
+                                id="cancelUploadButton"
+                                onClick={toggleAddingFile}
+                            />
+                        </>
+                    }
+                    {!addingFile &&
+                        <>
+                            <input
+                                type="button"
+                                value="+ add a new file"
+                                id="addFileToggle"
+                                onClick={toggleAddingFile}
+                            />
+                        </>
+                    }
+                </div>
+            </form>
+        </div>
     )
 }
 
-UploadForm.propTypes = { 
+UploadForm.propTypes = {
     folderId: PropTypes.string,
-    refetch: PropTypes.func 
+    refetch: PropTypes.func
 }
 
 export default UploadForm;
