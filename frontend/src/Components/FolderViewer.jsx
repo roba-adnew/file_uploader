@@ -163,7 +163,7 @@ function FolderViewer() {
                         <span>type</span>
                         <span>size</span>
                         <span>created at</span>
-                        <span>last updated at</span>
+                        <span>last viewed</span>
                     </div>
                     {subFolders.length > 0 &&
                         <>

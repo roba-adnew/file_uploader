@@ -39,6 +39,21 @@ exports.postFileUpload = [
                     })
             }
 
+            const { data, error } = await supabase
+                .storage
+                .from('files')
+                .upload(originalname, buffer, {
+                    contentType: mimetype,
+                    upsert: false
+                })
+
+            if (error) {
+                debug('Error uploading to Supabase:', error)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to upload file' })
+            }
+
             if (!parentFolderId) {
                 const rootFolder = await prisma.folder.findFirst({
                     where: { AND: { userId: req.user.id, isRoot: true } }
@@ -52,7 +67,8 @@ exports.postFileUpload = [
                     type: mimetype,
                     sizeKB: fileSizeKB,
                     owner: { connect: { id: req.user.id } },
-                    parentFolder: { connect: { id: parentFolderId } }
+                    parentFolder: { connect: { id: parentFolderId } },
+                    sbId: data.id
                 }
             })
 
@@ -73,21 +89,6 @@ exports.postFileUpload = [
                 where: { id: newFile.userId },
                 data: { memoryUsedKB: { increment: newFile.sizeKB } }
             })
-
-            const { data, error } = await supabase
-                .storage
-                .from('files')
-                .upload(originalname, buffer, {
-                    contentType: mimetype,
-                    upsert: false
-                })
-
-            if (error) {
-                debug('Error uploading to Supabase:', error)
-                return res
-                    .status(500)
-                    .json({ error: 'Failed to upload file' })
-            }
 
             debug('sb upload: %O', data)
             debug('sb error upload: %O', error)
@@ -117,13 +118,21 @@ exports.getFile = [
                 where: { id: fileId },
                 data: { downloads: { increment: 1 } }
             })
-            const fileName = fileDetails.name
+            const supabaseId = fileDetails.sbId
+            debug('sbid dn', supabaseId)
             const { data, error } = await supabase
                 .storage
                 .from('files')
-                .download(fileName)
+                .download(fileDetails.name)
 
-            const fileObject = new File([data], fileName)
+            if (error) {
+                debug('Error downloading from Supabase:', error)
+                return res
+                    .status(500)
+                    .json({ error: 'Failed to download file' })
+            }
+
+            const fileObject = new File([data], fileDetails.name)
             const file = Buffer.from(await fileObject.arrayBuffer())
 
             debug('sb data raw:%O', data)
