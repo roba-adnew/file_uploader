@@ -162,3 +162,14 @@
     padding: 0.2rem 0rem 0.2rem 0rem;
     border: 0.5px solid rgb(82, 82, 82);
 }
+
+.trashFolder {
+    display: inline-grid;
+    grid-template-columns: 2% 41% 28%;
+    width: 100%;
+    background-color: black;
+    color: white;
+    text-align: left;
+    padding: 0.2rem 0rem 0.2rem 0rem;
+    border: 0.5px solid rgb(82, 82, 82);
+}

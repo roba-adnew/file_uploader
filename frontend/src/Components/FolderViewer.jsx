@@ -1,6 +1,12 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
+import { CiFolderOn, CiFileOn } from "react-icons/ci";
+import { FaFolderOpen } from "react-icons/fa";
+import { MdLabel } from "react-icons/md";
+import { FaTrashAlt } from "react-icons/fa";
+import PropTypes from 'prop-types'
+
 import { AuthContext } from '../Contexts/AuthContext';
 import {
     getFolderContents as apiGetFolderContents,
@@ -11,11 +17,8 @@ import { sizeDisplay, typeDisplay } from '../utils/functions'
 import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
 import ParentFolderButton from './ParentFolderButton';
-import { CiFolderOn, CiFileOn } from "react-icons/ci";
-import { FaFolderOpen } from "react-icons/fa";
-import { MdLabel } from "react-icons/md";
-import { FaTrashAlt } from "react-icons/fa";
 import '../Styles/FolderViewer.css'
+
 
 function FolderViewer() {
     const [folderId, setFolderId] = useState(null)
@@ -78,19 +81,19 @@ function FolderViewer() {
         navigate('/trash', { state: { lastFolderId: folderId } })
     }
 
-    function allowDrop(e) { 
-        e.preventDefault(); 
-        e.stopPropagation(); 
+    function allowDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
     }
 
-    function grabFileId(e) { 
+    function grabFileId(e) {
         e.stopPropagation();
-        e.dataTransfer.setData('file', e.target.id) 
+        e.dataTransfer.setData('file', e.target.id)
     }
 
-    function grabFolderId(e) { 
+    function grabFolderId(e) {
         e.stopPropagation();
-        e.dataTransfer.setData('folder', e.target.id) 
+        e.dataTransfer.setData('folder', e.target.id)
     }
 
     async function updateParentFolder(e) {
@@ -133,6 +136,81 @@ function FolderViewer() {
         error
     });
 
+    function FolderRow({ folder }) {
+        return (
+            <div
+                id={folder.id}
+                className="folderRow"
+                draggable="true"
+                onClick={loadNewFolder}
+                onDragStart={grabFolderId}
+                onDragOver={allowDrop}
+                onDrop={updateParentFolder}
+            >
+                <CiFolderOn />
+                <span className='folderField'>
+                    {folder.name}
+                </span>
+                <span className='folderField'>
+                    &nbsp;&nbsp;&nbsp;-
+                </span>
+                <span className='folderField'>
+                    {sizeDisplay(folder.sizeKB)}
+                </span>
+                <span className='folderField'>
+                    {format(
+                        folder.createdAt,
+                        'M-dd-yyy, h:mm aaa'
+                    )}
+                </span>
+                <span className='folderField'>
+                    {format(
+                        folder.updatedAt,
+                        'M-dd-yyy, h:mm aaa'
+                    )}
+                </span>
+            </div>
+        )
+    }
+
+    function FileRow({ file }) {
+        return (
+            <div
+                id={file.id}
+                draggable="true"
+                className="fileRow"
+                onClick={loadFile}
+                onDragStart={grabFileId}
+            >
+                <CiFileOn />
+                <span className='fileField'>
+                    {file.name}
+                </span>
+                <span className='fileField'>
+                    {typeDisplay(file.type)}
+                </span>
+                <span className='fileField'>
+                    {sizeDisplay(file.sizeKB)}
+                </span>
+                <span className='fileField'>
+                    {format(
+                        file.createdAt,
+                        'M-dd-yyy, h:mm aaa'
+                    )}
+                </span>
+                <span className='fileField'>
+                    {format(
+                        file.updatedAt,
+                        'M-dd-yyy, h:mm aaa'
+                    )}
+                </span>
+            </div>
+        )
+    }
+
+    FolderRow.propTypes = { folder: PropTypes.object }
+    FileRow.propTypes = { file: PropTypes.object }
+
     return (
         isAuthorized ?
             <>
@@ -145,9 +223,9 @@ function FolderViewer() {
                                 allowDrop={allowDrop}
                                 updateParentFolder={updateParentFolder}
                             />
-
                         </div>
                     }
+
                     <div className='currentFolder'>
                         <FaFolderOpen />
                         &nbsp;{folderName === "root" ? "/" : folderName}
@@ -165,95 +243,41 @@ function FolderViewer() {
                         <span>created at</span>
                         <span>last viewed</span>
                     </div>
+
                     {subFolders.length > 0 &&
                         <>
                             {subFolders.map((folder) => {
                                 return (
-                                    <div
+                                    <FolderRow
                                         key={folder.id}
-                                        id={folder.id}
-                                        className="folderRow"
-                                        draggable="true"
-                                        onClick={loadNewFolder}
-                                        onDragStart={grabFolderId}
-                                        onDragOver={allowDrop}
-                                        onDrop={updateParentFolder}
-                                    >
-                                        <CiFolderOn />
-                                        <span className='folderField'>
-                                            {folder.name}
-                                        </span>
-                                        <span className='folderField'>
-                                            &nbsp;&nbsp;&nbsp;-
-                                        </span>
-                                        <span className='folderField'>
-                                            {sizeDisplay(folder.sizeKB)}
-                                        </span>
-                                        <span className='folderField'>
-                                            {format(
-                                                folder.createdAt,
-                                                'M-dd-yyy, h:mm aaa'
-                                            )}
-                                        </span>
-                                        <span className='folderField'>
-                                            {format(
-                                                folder.updatedAt,
-                                                'M-dd-yyy, h:mm aaa'
-                                            )}
-                                        </span>
-                                    </div>
+                                        folder={folder}
+                                    />
                                 )
                             })}
                         </>
                     }
+
                     <AddFolderForm
                         className='folderRow'
                         folderId={folderId}
                         refetch={setRefetch}
                     />
-                    {
-                        files.length > 0 &&
-                        <>
-                            {files.map((file) => {
-                                return (
-                                    <div
-                                        key={file.id}
-                                        id={file.id}
-                                        draggable="true"
-                                        className="fileRow"
-                                        onClick={loadFile}
-                                        onDragStart={grabFileId}
-                                    >
-                                        <CiFileOn />
-                                        <span className='fileField'>
-                                            {file.name}
-                                        </span>
-                                        <span className='fileField'>
-                                            {typeDisplay(file.type)}
-                                        </span>
-                                        <span className='fileField'>
-                                            {sizeDisplay(file.sizeKB)}
-                                        </span>
-                                        <span className='fileField'>
-                                            {format(
-                                                file.createdAt,
-                                                'M-dd-yyy, h:mm aaa'
-                                            )}
-                                        </span>
-                                        <span className='fileField'>
-                                            {format(
-                                                file.updatedAt,
-                                                'M-dd-yyy, h:mm aaa'
-                                            )}
-                                        </span>
-                                    </div>
-                                )
-                            })}
-                        </>
+
+                    {files.length > 0 &&
+                        files.map((file) => {
+                            return (
+                                <FileRow
+                                    key={file.id}
+                                    file={file}
+                                />
+                            )
+                        })
                     }
+
                     <UploadForm folderId={folderId} refetch={setRefetch} />
 
                 </div >
+                
                 <button id='trashButton' type="button" onClick={goToTrash}>
                     <FaTrashAlt /> View Trash
                 </button>
@@ -261,5 +285,6 @@ function FolderViewer() {
             : <div>please login to continue</div>
     )
 }
+
 
 export default FolderViewer

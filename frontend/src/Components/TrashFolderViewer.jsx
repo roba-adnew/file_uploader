@@ -94,8 +94,10 @@ function TrashFolderViewer() {
                 </dialog>
                 {midDeletion && dialogRef.current.showModal()}
                 <div id='trashFolderViewer'>
-                    <div className='currentFolder'>
-                        <FaTrashAlt /> Trash
+                    <div className='trashFolder'>
+                        <FaTrashAlt /> 
+                        <span>Trash</span>
+                        {sizeDisplay(contents.sizeKB)} / 500 KB
                     </div>
                     <div className='trashLabelRow'>
                         <MdLabel />
