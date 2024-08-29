@@ -10,7 +10,8 @@ import PropTypes from 'prop-types'
 import { AuthContext } from '../Contexts/AuthContext';
 import {
     getFolderContents as apiGetFolderContents,
-    moveFolder as apiMoveFolder
+    moveFolder as apiMoveFolder,
+    updateFolderName as apiUpdateFolderName
 } from '../utils/folderApi';
 import { moveFile as apiMoveFile } from '../utils/fileApi';
 import { sizeDisplay, typeDisplay } from '../utils/functions'
@@ -18,6 +19,111 @@ import UploadForm from './UploadForm';
 import AddFolderForm from './AddFolderForm';
 import ParentFolderButton from './ParentFolderButton';
 import '../Styles/FolderViewer.css'
+
+function FolderRow({ folder, loadNewFolder, updateParentFolder, refetch }) {
+    const [newName, setNewName] = useState(folder.name);
+    const [editing, setEditing] = useState(false);
+
+    function allowChange(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function updateName(e) { setNewName(e.target.value) }
+
+    function toggleForm(e) {
+        allowChange(e);
+        setEditing(!editing)
+    }
+
+    function revert(e) {
+        setNewName(folder.name);
+        toggleForm(e)
+    }
+
+    function grabFolderId(e) {
+        allowChange(e);
+        e.dataTransfer.setData('folder', e.target.id)
+    }
+
+    async function handleSubmission(e) {
+        e.preventDefault()
+        try {
+            console.log('commencing folder name change')
+            const response =
+                await apiUpdateFolderName(folder.id, newName)
+            console.log('response', response)
+            console.log('folder name changed')
+            toggleForm(e)
+            refetch(true)
+        } catch (err) {
+            console.error(err)
+            throw err
+    }
+}
+
+    function EditFolderNameForm() {
+        return (
+            <div className='editNameDiv' onClick={allowChange}>
+                <form
+                    className='editNameForm'
+                    method='PUT'>
+                    <input
+                        value={newName}
+                        onChange={updateName}
+                        autoFocus
+                    />
+                    <div className='formButtons'>
+                        <button className='addBtn' onClick={handleSubmission}>
+                            update name -&nbsp;
+                        </button>
+                        <button className='cancelBtn' onClick={revert}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        )
+    }
+
+    return (
+        <div
+            id={folder.id}
+            className="folderRow"
+            draggable="true"
+            onClick={loadNewFolder}
+            onDragStart={grabFolderId}
+            onDragOver={allowChange}
+            onDrop={updateParentFolder}
+        >
+            <CiFolderOn />
+            {editing
+                ? <EditFolderNameForm />
+                : <span className='folderField' onClick={toggleForm}>
+                    {newName}
+                </span>
+            }
+            <span className='folderField'>
+                &nbsp;&nbsp;&nbsp;-
+            </span>
+            <span className='folderField'>
+                {sizeDisplay(folder.sizeKB)}
+            </span>
+            <span className='folderField'>
+                {format(
+                    folder.createdAt,
+                    'M-dd-yyy, h:mm aaa'
+                )}
+            </span>
+            <span className='folderField'>
+                {format(
+                    folder.updatedAt,
+                    'M-dd-yyy, h:mm aaa'
+                )}
+            </span>
+        </div>
+    )
+}
 
 
 function FolderViewer() {
@@ -91,11 +197,6 @@ function FolderViewer() {
         e.dataTransfer.setData('file', e.target.id)
     }
 
-    function grabFolderId(e) {
-        e.stopPropagation();
-        e.dataTransfer.setData('folder', e.target.id)
-    }
-
     async function updateParentFolder(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -136,42 +237,7 @@ function FolderViewer() {
         error
     });
 
-    function FolderRow({ folder }) {
-        return (
-            <div
-                id={folder.id}
-                className="folderRow"
-                draggable="true"
-                onClick={loadNewFolder}
-                onDragStart={grabFolderId}
-                onDragOver={allowDrop}
-                onDrop={updateParentFolder}
-            >
-                <CiFolderOn />
-                <span className='folderField'>
-                    {folder.name}
-                </span>
-                <span className='folderField'>
-                    &nbsp;&nbsp;&nbsp;-
-                </span>
-                <span className='folderField'>
-                    {sizeDisplay(folder.sizeKB)}
-                </span>
-                <span className='folderField'>
-                    {format(
-                        folder.createdAt,
-                        'M-dd-yyy, h:mm aaa'
-                    )}
-                </span>
-                <span className='folderField'>
-                    {format(
-                        folder.updatedAt,
-                        'M-dd-yyy, h:mm aaa'
-                    )}
-                </span>
-            </div>
-        )
-    }
+
 
     function FileRow({ file }) {
         return (
@@ -208,7 +274,7 @@ function FolderViewer() {
         )
     }
 
-    FolderRow.propTypes = { folder: PropTypes.object }
+
     FileRow.propTypes = { file: PropTypes.object }
 
     return (
@@ -251,6 +317,9 @@ function FolderViewer() {
                                     <FolderRow
                                         key={folder.id}
                                         folder={folder}
+                                        loadNewFolder={loadNewFolder}
+                                        updateParentFolder={updateParentFolder}
+                                        refetch={setRefetch}
                                     />
                                 )
                             })}
@@ -277,7 +346,7 @@ function FolderViewer() {
                     <UploadForm folderId={folderId} refetch={setRefetch} />
 
                 </div >
-                
+
                 <button id='trashButton' type="button" onClick={goToTrash}>
                     <FaTrashAlt /> View Trash
                 </button>
@@ -286,5 +355,12 @@ function FolderViewer() {
     )
 }
 
+
+FolderRow.propTypes = {
+    folder: PropTypes.object,
+    loadNewFolder: PropTypes.func,
+    updateParentFolder: PropTypes.func,
+    refetch: PropTypes.func
+}
 
 export default FolderViewer

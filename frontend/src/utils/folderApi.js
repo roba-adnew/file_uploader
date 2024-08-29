@@ -7,12 +7,12 @@ async function getFolderContents(folderId = null) {
     console.log('folderId to retrieve', folderId)
     const url = `${base_url}/view`;
     const options = {
-        method: 'POST', 
+        method: 'POST',
         credentials: 'include',
         headers: { 'Content-type': 'application/json' },
     }
     if (folderId !== null) options['body'] = JSON.stringify(
-       { folderId : folderId }
+        { folderId: folderId }
     );
     console.log('folder call options', options)
     try {
@@ -77,11 +77,11 @@ async function addFolder(parentFolderId, folderName) {
 async function moveFolder(folderId, newParentFolderId) {
     const url = `${base_url}/location`;
     const body = {
-        folderId: folderId, 
+        folderId: folderId,
         newParentFolderId: newParentFolderId
     }
     const options = {
-        method: 'PUT', 
+        method: 'PUT',
         credentials: 'include',
         headers: { 'Content-type': 'application/json' },
         body: JSON.stringify(body)
@@ -100,4 +100,36 @@ async function moveFolder(folderId, newParentFolderId) {
     }
 }
 
-export { getFolderContents, addFolder, getTrashContents, moveFolder }
+async function updateFolderName(folderId, newName) {
+    const url = `${base_url}/name`;
+    const body = {
+        folderId: folderId,
+        newName: newName
+    }
+    const options = {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(body)
+    }
+    try {
+        const response = await fetch(url, options)
+        console.log('upload response', response)
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'folder change failed');
+        }
+        return response.json()
+    } catch (err) {
+        console.error('upload error:', err)
+        throw err
+    }
+}
+
+export {
+    getFolderContents,
+    addFolder,
+    getTrashContents,
+    moveFolder,
+    updateFolderName
+}
