@@ -173,3 +173,7 @@
     padding: 0.2rem 0rem 0.2rem 0rem;
     border: 0.5px solid rgb(82, 82, 82);
 }
+
+.trashWarning {
+    font-style: italic;
+}

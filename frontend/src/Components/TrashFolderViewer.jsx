@@ -152,6 +152,10 @@ function TrashFolderViewer() {
                         : <div>No trash yet</div>
                     }
                 </div>
+                <div className="trashWarning">
+                    Note: Once the trash limit is reached, files will 
+                    automatically be deleted based on first in first out. 
+                </div>
                 <button id='backButton' type="button" onClick={goBack}>
                     go back
                 </button>
