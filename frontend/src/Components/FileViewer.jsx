@@ -1,15 +1,18 @@
-import { useState, useEffect, useContext } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom';
-import { format } from 'date-fns'
-import { AuthContext } from '../Contexts/AuthContext';
-import { getFileDetails as apiGetFile, deleteFile as apiDeleteFile }
-    from '../utils/fileApi';
-import { sizeDisplay, typeDisplay } from '../utils/functions';
-import ParentFolderButton from './ParentFolderButton';
+import { useState, useEffect, useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { AuthContext } from "../Contexts/AuthContext";
+import {
+    getFileDetails as apiGetFile,
+    deleteFile as apiDeleteFile,
+} from "../utils/fileApi";
+import { sizeDisplay, typeDisplay } from "../utils/functions";
+import ParentFolderButton from "./ParentFolderButton";
+import "../Styles/FolderViewer.css";
 
 function FileViewer() {
-    const { isAuthorized } = useContext(AuthContext)
-    const [file, setFile] = useState(null)
+    const { isAuthorized } = useContext(AuthContext);
+    const [file, setFile] = useState(null);
     let location = useLocation();
     const navigate = useNavigate();
     const fileId = location.state?.id;
@@ -17,10 +20,10 @@ function FileViewer() {
     useEffect(() => {
         async function getFile() {
             const fileObject = await apiGetFile(fileId);
-            setFile(fileObject)
+            setFile(fileObject);
         }
-        getFile()
-    }, [fileId])
+        getFile();
+    }, [fileId]);
 
     if (!file || !file.details) {
         return <div>No file data available</div>;
@@ -28,7 +31,7 @@ function FileViewer() {
 
     function handleDownload() {
         if (file && file.content) {
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.href = file.content;
             link.download = file.details.name;
             document.body.appendChild(link);
@@ -38,14 +41,14 @@ function FileViewer() {
     }
 
     async function handleDeletion(e) {
-        const deletion = await apiDeleteFile(e.target.id)
-        console.log(deletion)
-        navigate("/", { state: { id: file.details.parentFolderId } })
+        const deletion = await apiDeleteFile(e.target.id);
+        console.log(deletion);
+        navigate("/", { state: { id: file.details.parentFolderId } });
     }
 
-    const FileDetails = () => (
-        file.details
-            ? <table>
+    const FileDetails = () =>
+        file.details ? (
+            <table>
                 <tbody>
                     <tr>
                         <td>name</td>
@@ -61,19 +64,19 @@ function FileViewer() {
                     </tr>
                     <tr>
                         <td>created at</td>
-                        <td>{
-                            format(
+                        <td>
+                            {format(
                                 file.details.createdAt,
-                                'M-dd-yyy, h:mm aaa'
+                                "M-dd-yyy, h:mm aaa"
                             )}
                         </td>
                     </tr>
                     <tr>
                         <td>last updated at</td>
-                        <td>{
-                            format(
+                        <td>
+                            {format(
                                 file.details.updatedAt,
-                                'M-dd-yyy, h:mm aaa'
+                                "M-dd-yyy, h:mm aaa"
                             )}
                         </td>
                     </tr>
@@ -83,35 +86,37 @@ function FileViewer() {
                     </tr>
                 </tbody>
             </table>
-            : <div>no file loaded </div>
-    )
+        ) : (
+            <div>no file loaded </div>
+        );
 
-    console.log('file', file)
-    return (
-        isAuthorized ?
-            <>
+    console.log("file", file);
+
+    return isAuthorized ? (
+        <>
+            <div className="parentFolder">
                 <ParentFolderButton parentId={file.details.parentFolderId} />
-                {file.details.type.startsWith('image')
-                    ? <img src={file.content} alt={file.details.name} />
-                    : <div>Preview for {file.details.name} not available </div>
-                }
-                <FileDetails />
-                <button
-                    className="downloadButton"
-                    onClick={handleDownload}
-                >
-                    Download {file.details.name}
-                </button>
-                <button
-                    id={file.details.id}
-                    className="deleteButton"
-                    onClick={handleDeletion}
-                >
-                    Delete {file.details.name}
-                </button>
-            </>
-            : <div>please login to view file</div>
-    )
+            </div>
+            {file.details.type.startsWith("image") ? (
+                <img src={file.content} alt={file.details.name} />
+            ) : (
+                <div>Preview for {file.details.name} not available </div>
+            )}
+            <FileDetails />
+            <button className="downloadButton" onClick={handleDownload}>
+                Download {file.details.name}
+            </button>
+            <button
+                id={file.details.id}
+                className="deleteButton"
+                onClick={handleDeletion}
+            >
+                Delete {file.details.name}
+            </button>
+        </>
+    ) : (
+        <div>please login to view file</div>
+    );
 }
 
-export default FileViewer
+export default FileViewer;

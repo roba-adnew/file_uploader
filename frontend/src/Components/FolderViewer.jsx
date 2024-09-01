@@ -78,7 +78,7 @@ function FolderRow({ folder, loadNewFolder, updateParentFolder, refetch }) {
                             update name -&nbsp;
                         </button>
                         <button className='cancelBtn' onClick={revert}>
-                            Cancel
+                            cancel
                         </button>
                     </div>
                 </form>
@@ -99,7 +99,10 @@ function FolderRow({ folder, loadNewFolder, updateParentFolder, refetch }) {
             <CiFolderOn />
             {editing
                 ? <EditFolderNameForm />
-                : <span className='folderField' onClick={toggleForm}>
+                : <span 
+                    className='folderFieldName' 
+                    onDoubleClick={toggleForm}
+                >
                     {newName}
                 </span>
             }
@@ -124,7 +127,6 @@ function FolderRow({ folder, loadNewFolder, updateParentFolder, refetch }) {
         </div>
     )
 }
-
 
 function FolderViewer() {
     const [folderId, setFolderId] = useState(null)
@@ -237,8 +239,6 @@ function FolderViewer() {
         error
     });
 
-
-
     function FileRow({ file }) {
         return (
             <div
@@ -273,7 +273,6 @@ function FolderViewer() {
             </div>
         )
     }
-
 
     FileRow.propTypes = { file: PropTypes.object }
 

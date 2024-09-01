@@ -34,15 +34,17 @@ exports.postFileUpload = [
                 return res
                     .status(405)
                     .json({
-                        message: "memory limit exceeded. \
-                        try a smaller file or deleting a current file"
+                        message: 'memory limit exceeded.\
+                        try a smaller file or deleting a current file'
                     })
             }
+
+            const sbName = makeSupabaseName(originalname)
 
             const { data, error } = await supabase
                 .storage
                 .from('files')
-                .upload(originalname, buffer, {
+                .upload(sbName, buffer, {
                     contentType: mimetype,
                     upsert: false
                 })
@@ -68,7 +70,8 @@ exports.postFileUpload = [
                     sizeKB: fileSizeKB,
                     owner: { connect: { id: req.user.id } },
                     parentFolder: { connect: { id: parentFolderId } },
-                    sbId: data.id
+                    sbId: data.id,
+                    sbName: sbName
                 }
             })
 
@@ -123,7 +126,7 @@ exports.getFile = [
             const { data, error } = await supabase
                 .storage
                 .from('files')
-                .download(fileDetails.name)
+                .download(fileDetails.sbName)
 
             if (error) {
                 debug('Error downloading from Supabase:', error)
@@ -215,6 +218,7 @@ exports.updateFileNamePut = [
                     .json({ error: 'Failed to upload file' })
             }
 
+            const newSbName = makeSupabaseName(newName);
             const fileObject = new File([downloadData], fileDetails.name)
             const fileBuffer = Buffer.from(await fileObject.arrayBuffer())
 
@@ -222,7 +226,7 @@ exports.updateFileNamePut = [
                 error: nameChangeDeleteError } = await supabase
                     .storage
                     .from('files')
-                    .remove([fileDetails.name])
+                    .remove([fileDetails.sbName])
 
             if (nameChangeDeleteError) {
                 debug('Error deleting from supabase for name change:'
@@ -234,14 +238,17 @@ exports.updateFileNamePut = [
 
             const updatedFile = await prisma.file.update({
                 where: { id: fileId },
-                data: { name: `${newName}${ext}` }
+                data: { 
+                    name: `${newName}${ext}`,
+                    sbName: `${newSbName}${ext}` 
+                }
             })
 
             const { data: nameChangeUploadData,
                 error: nameChangeUploadError } = await supabase
                     .storage
                     .from('files')
-                    .upload(updatedFile.name, fileBuffer, {
+                    .upload(updatedFile.sbName, fileBuffer, {
                         contentType: downloadData.type,
                         upsert: false
                     })
@@ -423,7 +430,7 @@ exports.deleteFile = [
                     const { data, error } = await supabase
                         .storage
                         .from('files')
-                        .remove([file.name])
+                        .remove([file.sbName])
 
                     if (error) {
                         debug('error deleting file', error)
@@ -472,7 +479,7 @@ exports.permanentlyDeleteFile = [
         const { data, error } = await supabase
             .storage
             .from('files')
-            .remove([fileToDelete.name])
+            .remove([fileToDelete.sbName])
 
         if (error) {
             debug('error deleting file', error)
@@ -488,3 +495,8 @@ exports.permanentlyDeleteFile = [
             .json({ message: `${fileToDelete.name} has been deleted` })
     }
 ]
+
+function makeSupabaseName(fileName) {
+    const fileNameCopy = fileName;
+    return fileNameCopy.replace(' ', '_')
+}

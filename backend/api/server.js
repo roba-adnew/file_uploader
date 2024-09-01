@@ -3,15 +3,15 @@ const express = require('express')
 const session = require('express-session');
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const passport = require('./src/controllers/passportConfig')
+const passport = require('../src/controllers/passportConfig')
 const debug = require('debug')('backend:server')
 
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const { PrismaClient } = require('@prisma/client');
 
-const authRouter = require('./src/routes/authRouter')
-const fileRouter = require('./src/routes/fileRouter')
-const folderRouter = require('./src/routes/folderRouter')
+const authRouter = require('../src/routes/authRouter')
+const fileRouter = require('../src/routes/fileRouter')
+const folderRouter = require('../src/routes/folderRouter')
 
 const prisma = new PrismaClient()
 const prismaSession = new PrismaSessionStore(

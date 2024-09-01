@@ -1,9 +1,9 @@
 {
   "name": "@file_uploader/backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "api/server.js",
   "scripts": {
-    "devstart": "nodemon server.js"
+    "devstart": "nodemon api/server.js"
   },
   "author": "",
   "license": "ISC",

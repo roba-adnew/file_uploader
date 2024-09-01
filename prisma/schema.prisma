@@ -41,6 +41,7 @@ model File {
   downloads Int      @default(0)
   sizeKB    Float    @default(0)
   sbId      String?
+  sbName    String?
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?
