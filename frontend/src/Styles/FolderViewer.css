@@ -61,7 +61,7 @@
     border: 0.5px solid rgb(82, 82, 82);
 }
 
-.folderFieldName {
+.folderFieldName, .fileFieldName, .extField {
     width: fit-content;
 }
 

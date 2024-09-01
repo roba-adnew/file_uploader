@@ -39,12 +39,10 @@ exports.postFileUpload = [
                     })
             }
 
-            const sbName = makeSupabaseName(originalname)
-
             const { data, error } = await supabase
                 .storage
                 .from('files')
-                .upload(sbName, buffer, {
+                .upload(originalname, buffer, {
                     contentType: mimetype,
                     upsert: false
                 })
@@ -71,7 +69,6 @@ exports.postFileUpload = [
                     owner: { connect: { id: req.user.id } },
                     parentFolder: { connect: { id: parentFolderId } },
                     sbId: data.id,
-                    sbName: sbName
                 }
             })
 
@@ -126,7 +123,7 @@ exports.getFile = [
             const { data, error } = await supabase
                 .storage
                 .from('files')
-                .download(fileDetails.sbName)
+                .download(fileDetails.name)
 
             if (error) {
                 debug('Error downloading from Supabase:', error)
@@ -218,7 +215,6 @@ exports.updateFileNamePut = [
                     .json({ error: 'Failed to upload file' })
             }
 
-            const newSbName = makeSupabaseName(newName);
             const fileObject = new File([downloadData], fileDetails.name)
             const fileBuffer = Buffer.from(await fileObject.arrayBuffer())
 
@@ -226,7 +222,7 @@ exports.updateFileNamePut = [
                 error: nameChangeDeleteError } = await supabase
                     .storage
                     .from('files')
-                    .remove([fileDetails.sbName])
+                    .remove([fileDetails.name])
 
             if (nameChangeDeleteError) {
                 debug('Error deleting from supabase for name change:'
@@ -240,7 +236,6 @@ exports.updateFileNamePut = [
                 where: { id: fileId },
                 data: { 
                     name: `${newName}${ext}`,
-                    sbName: `${newSbName}${ext}` 
                 }
             })
 
@@ -248,7 +243,7 @@ exports.updateFileNamePut = [
                 error: nameChangeUploadError } = await supabase
                     .storage
                     .from('files')
-                    .upload(updatedFile.sbName, fileBuffer, {
+                    .upload(updatedFile.name, fileBuffer, {
                         contentType: downloadData.type,
                         upsert: false
                     })
@@ -430,7 +425,7 @@ exports.deleteFile = [
                     const { data, error } = await supabase
                         .storage
                         .from('files')
-                        .remove([file.sbName])
+                        .remove([file.name])
 
                     if (error) {
                         debug('error deleting file', error)
@@ -479,7 +474,7 @@ exports.permanentlyDeleteFile = [
         const { data, error } = await supabase
             .storage
             .from('files')
-            .remove([fileToDelete.sbName])
+            .remove([fileToDelete.name])
 
         if (error) {
             debug('error deleting file', error)
@@ -495,8 +490,3 @@ exports.permanentlyDeleteFile = [
             .json({ message: `${fileToDelete.name} has been deleted` })
     }
 ]
-
-function makeSupabaseName(fileName) {
-    const fileNameCopy = fileName;
-    return fileNameCopy.replace(' ', '_')
-}

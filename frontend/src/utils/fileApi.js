@@ -104,6 +104,32 @@ async function moveFile(fileId, newParentFolderId) {
     }
 }
 
+async function updateFileName(fileId, newFileName) {
+    const url = `${base_url}/name`;
+    const body = {
+        fileId: fileId,
+        newName: newFileName
+    }
+    const options = {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(body)
+    }
+    try {
+        const response = await fetch(url, options)
+        console.log('upload response', response)
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'file change failed');
+        }
+        return response.json()
+    } catch (err) {
+        console.error('upload error:', err)
+        throw err
+    }
+}
+
 async function permanentlyDeleteFile(fileId) {
     const url = `${base_url}/delete`
     const options = {
@@ -127,5 +153,6 @@ export {
     getFileDetails, 
     deleteFile, 
     moveFile, 
+    updateFileName,
     permanentlyDeleteFile 
 }

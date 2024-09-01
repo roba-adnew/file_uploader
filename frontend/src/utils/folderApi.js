@@ -100,11 +100,11 @@ async function moveFolder(folderId, newParentFolderId) {
     }
 }
 
-async function updateFolderName(folderId, newName) {
+async function updateFolderName(folderId, newFolderName) {
     const url = `${base_url}/name`;
     const body = {
         folderId: folderId,
-        newName: newName
+        newName: newFolderName
     }
     const options = {
         method: 'PUT',
